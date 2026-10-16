@@ -1,0 +1,35 @@
+services:
+  falkordb:
+    image: falkordb/falkordb:latest
+    ports: ["127.0.0.1:6379:6379"]
+    volumes:
+      - engram-data:/var/lib/falkordb/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    environment:
+      FALKORDB_URL: falkor://falkordb:6379
+      FALKORDB_GRAPH: engram
+      CORS_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+      PORT: "8000"
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      falkordb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  engram-data:

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: engram-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    envVars:
+      - key: FALKORDB_URL
+        sync: false
+      - key: FALKORDB_GRAPH
+        value: engram
+      - key: CORS_ORIGINS
+        sync: false
+      - key: PORT
+        value: 8000
