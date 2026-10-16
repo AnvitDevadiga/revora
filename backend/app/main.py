@@ -10,12 +10,15 @@ from secrets import compare_digest
 from .engine import build_engine
 from .laboratory import Laboratory, SCENARIOS
 from .runtime import Runtime, evaluate
+from .groq_agent import GroqAgent
+from .deployment import evaluate_deployments
 
 app = FastAPI(title="ENGRAM API", version="0.1.0")
 cors_origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",") if origin.strip()]
 engine = build_engine()
 laboratory = Laboratory(engine.graph)
 runtime = Runtime(engine.graph)
+groq_agent = GroqAgent(engine.graph)
 API_KEY = os.getenv("ENGRAM_API_KEY", "")
 RATE_LIMIT = int(os.getenv("RATE_LIMIT_PER_MINUTE", "120"))
 request_log: dict[str, deque[float]] = defaultdict(deque)
@@ -64,6 +67,23 @@ class SandboxRunIn(BaseModel):
     workload: str = Field(default="imported-contacts", min_length=1, max_length=64)
     values: list[str] = Field(min_length=1, max_length=1000)
 
+class GroqRunIn(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+    goal: str = Field(default="Safely evaluate this deployment", min_length=3, max_length=300)
+    service: str = Field(default="payments", min_length=1, max_length=64, pattern=r"^[a-zA-Z0-9_-]+$")
+    scenario: Literal["healthy", "readiness_failure", "canary_regression", "slow_release"] = "canary_regression"
+
+@app.get("/api/llm/status")
+def llm_status():
+    return {"configured": groq_agent.configured, "provider": "Groq", "model": groq_agent.model}
+
+@app.post("/api/llm/run")
+def llm_run(payload: GroqRunIn):
+    try:
+        return groq_agent.run(**payload.model_dump())
+    except (RuntimeError, ValueError) as error:
+        raise HTTPException(503 if isinstance(error, RuntimeError) else 422, str(error)) from error
+
 @app.post("/api/runtime/run")
 def sandbox_run(payload: SandboxRunIn):
     if any(not value or len(value) > 200 for value in payload.values):
@@ -79,7 +99,7 @@ def runtime_history():
 
 @app.get("/api/evaluation")
 def evaluation():
-    return evaluate()
+    return {"database": evaluate(), "deployments": evaluate_deployments()}
 
 class ReplayIn(BaseModel):
     scenario: Literal["deployment", "migration"] = "deployment"

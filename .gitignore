@@ -7,5 +7,7 @@
 **/.env.local
 .DS_Store
 .audit-backup*/
+.groq-backup*/
+.groq-final-backup*/
 docs/artifacts/*.webm
 !docs/artifacts/demo-walkthrough.webm

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Laboratory from "./Laboratory";
 import Runtime from "./Runtime";
+import GroqAgent from "./GroqAgent";
 import "./errors.css";
 import "./laboratory.css";
 
@@ -35,6 +36,7 @@ export default function Home() {
       <button onClick={connect}>Connect</button><p role="status">{connection}</p>
     </header>
     <Runtime request={request} api={API} />
+    <GroqAgent request={request} api={API} />
     <Laboratory request={request} api={API} />
     <footer className="muted">Local research demo. One workspace, one API worker. SQLite executes only in disposable databases. Scenario replays are synthetic. Evidence scores are not safety guarantees.</footer>
   </main>;
