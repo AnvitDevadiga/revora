@@ -1,4 +1,6 @@
-# Living Memory (working name: ENGRAM)
+# Revora
+
+**AI remembers. Revora learns.**
 
 A local Graph Hacks Track 2 demo: an agent executes a bounded task, records failure and recovery in FalkorDB, and changes its next tool choice using those observations.
 
@@ -65,7 +67,7 @@ Browser acceptance: `frontend/tests/browser.cjs` uses Playwright and installed C
 - One local workspace, one API worker. Multi-worker concurrency and authenticated multi-tenant access are not implemented.
 - Up to 1,000 runs per graph and 1,000 input rows per tool run.
 - With no FALKORDB_URL the API uses temporary memory, visibly identified in the UI; Compose always configures FalkorDB.
-- Optional ENGRAM_API_KEY protects API routes; health and CORS preflight remain accessible.
+- Optional REVORA_API_KEY protects API routes; health and CORS preflight remain accessible.
 - Legacy prototype routes remain for compatibility. Their graph labels are separate from the event-built runtime and laboratory.
 - Public deployment is excluded from this delivery. Existing hosting templates are not a verified deployment.
 

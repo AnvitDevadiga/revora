@@ -31,7 +31,7 @@ export default function Home() {
       <div className="eyebrow">GRAPH HACKS / AGENT MEMORY & COORDINATION</div>
       <h1>Living Memory<span>—</span></h1>
       <p>An agent makes a mistake. The graph remembers. Its next decision changes.</p>
-      <p className="muted">Working title · ENGRAM</p>
+      <p className="muted">AI remembers. Revora learns.</p>
       <label>Workspace API key (if required) <input type="password" value={apiKey} onChange={event => setApiKey(event.target.value)} autoComplete="off" /></label>
       <button onClick={connect}>Connect</button><p role="status">{connection}</p>
     </header>

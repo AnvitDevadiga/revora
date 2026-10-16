@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: engram-api
+    name: revora-api
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
@@ -9,7 +9,7 @@ services:
       - key: FALKORDB_URL
         sync: false
       - key: FALKORDB_GRAPH
-        value: engram
+        value: revora
       - key: CORS_ORIGINS
         sync: false
       - key: PORT

@@ -2,7 +2,7 @@
 
 This describes the October 15 replay module. The October 16 SQLite runtime now supplies real sandbox execution, graph-based retrieval, durable revisions and held-out comparisons. See PROJECT_STATUS.md for the current verified checklist.
 
-The new laboratory adds an independently testable vertical slice beside the legacy prototype. ENGRAM remains a temporary label.
+The laboratory adds an independently testable vertical slice to Revora.
 
 ## What judges can verify
 1. Select the deployment or migration scenario and replay it.

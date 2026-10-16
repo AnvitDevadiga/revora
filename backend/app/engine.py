@@ -18,7 +18,7 @@ class MemoryEngine:
     """Evidence-backed memory loop; graph-backed state is reloaded from FalkorDB."""
     client: Any = None
     graph: Any = None
-    graph_name: str = "engram"
+    graph_name: str = "revora"
     episodes: list[dict] = field(default_factory=list)
     beliefs: dict[str, dict] = field(default_factory=dict)
     procedures: list[dict] = field(default_factory=list)
@@ -156,7 +156,7 @@ def build_engine() -> MemoryEngine:
         return MemoryEngine()
     from falkordb import FalkorDB
     client = FalkorDB.from_url(url)
-    graph_name = os.getenv("FALKORDB_GRAPH", "engram")
+    graph_name = os.getenv("FALKORDB_GRAPH", "revora")
     graph = client.select_graph(graph_name)
     graph.query("RETURN 1")
     return MemoryEngine(client=client, graph=graph, graph_name=graph_name)

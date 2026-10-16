@@ -13,13 +13,13 @@ from .runtime import Runtime, evaluate
 from .groq_agent import GroqAgent
 from .deployment import evaluate_deployments
 
-app = FastAPI(title="ENGRAM API", version="0.1.0")
+app = FastAPI(title="Revora API", version="0.1.0")
 cors_origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",") if origin.strip()]
 engine = build_engine()
 laboratory = Laboratory(engine.graph)
 runtime = Runtime(engine.graph)
 groq_agent = GroqAgent(engine.graph)
-API_KEY = os.getenv("ENGRAM_API_KEY", "")
+API_KEY = os.getenv("REVORA_API_KEY", "")
 RATE_LIMIT = int(os.getenv("RATE_LIMIT_PER_MINUTE", "120"))
 request_log: dict[str, deque[float]] = defaultdict(deque)
 
