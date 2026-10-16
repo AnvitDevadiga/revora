@@ -1,5 +1,7 @@
 # Audit — 15 October 2026
 
+Historical audit of the earlier prototype. The October 16 runtime and acceptance results in PROJECT_STATUS.md supersede the remaining-work list for the bounded local product. Legacy engine limitations remain documented here for transparency.
+
 ## Fixed
 - Belief insertion/reload keys differed, duplicating beliefs after restart. Keys now match; regression test checks evidence continuity.
 - Procedures were saved but not loaded. Reload now restores steps.

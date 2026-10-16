@@ -29,7 +29,7 @@ The first three phases are complete for the bounded, single-workspace sandbox pr
 - [x] Recorded automated walkthrough and narration script
 
 ## Evidence
-17 Python tests passed. Real FalkorDB acceptance verified a fresh Runtime instance learns from the prior run, preserves failures, stores revisions, links the next decision to earlier observations and deduplicates retries. Browser acceptance verified first-run failure/recovery, second-run improvement, both scenario replays, graph selection, evaluation results, reload history and no horizontal mobile overflow or page crashes.
+18 Python tests passed. Real FalkorDB acceptance verified a fresh Runtime instance learns from the prior run, preserves failures, stores revisions, links the next decision to earlier observations and deduplicates retries. Browser acceptance on the containerized production build verified first-run failure/recovery, second-run improvement, both scenario replays, graph selection, evaluation results, reload history and no horizontal mobile overflow or page crashes. A regression test confirms a current tool failure overrides many historical successes, preventing repeated failure on unchanged input.
 
 ## Explicit boundaries
 This is a bounded deterministic agent, not a general-purpose LLM agent. SQLite tools execute real SQL on disposable synthetic data. The deployment/migration story replays use synthetic outcomes. Evaluation results apply only to the supplied eight-case suite. Multi-worker coordination, authenticated multi-tenancy and production tool access are outside this local MVP. No public deployment was performed.

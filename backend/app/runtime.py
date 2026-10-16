@@ -95,6 +95,12 @@ class Runtime:
             events, trace = [], [{"role": "retriever", "evidence_count": len(evidence), "context": context}]
             for attempt in range(2):
                 before = policy(evidence + events)
+                failed_here = {e["action"] for e in events if not e["outcome"]["success"]}
+                if before["action"] in failed_here:
+                    alternative = next(action for action in ACTIONS if action not in failed_here)
+                    before["action"] = alternative
+                    before["evidence"] = next(b["evidence"] for b in before["beliefs"] if b["action"] == alternative)
+                    before["reason"] = "Current tool failure overrides historical preference; never repeat a failed tool on unchanged input."
                 trace.append({"role": "planner", "action": before["action"], "evidence": before["evidence"]})
                 outcome = execute(before["action"], request["values"])
                 event = {"id": f"{run_id}:{attempt}", "action": before["action"], "outcome": outcome}

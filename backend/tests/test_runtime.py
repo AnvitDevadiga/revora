@@ -50,3 +50,12 @@ def test_evaluation_reports_case_results_not_marketing_numbers():
 def test_unregistered_tool_rejected():
     with pytest.raises(ValueError):
         execute("shell", ["a"])
+
+def test_current_failure_overrides_many_old_successes():
+    agent = Runtime()
+    for index in range(6):
+        agent.run({**request(f"clean-{index}"), "values": ["a", "b"]})
+    changed = agent.run(request("now-dirty"))
+    assert changed["success"]
+    assert [e["action"] for e in changed["events"]] == ["create_unique_index", "deduplicate_then_index"]
+    assert "overrides" in changed["events"][1]["before"]["reason"]
