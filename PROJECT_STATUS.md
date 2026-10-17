@@ -64,7 +64,7 @@ The acceptance script restarts FastAPI during an active incident, restores the c
 
 ## Public frontend
 
-https://revora-graph-memory.vercel.app is deployed in the existing Vercel Hobby account. Anonymous HTTP and Chrome verification pass for the replay, source-record inspection, evidence JSON, setup guide, and 390px mobile layout. The hosted replay does not run a live Python backend.
+https://revora-anvitdevadiga.vercel.app is deployed in the existing Vercel Hobby account. Anonymous HTTP and Chrome verification pass for the replay, source-record inspection, evidence JSON, setup guide, and 390px mobile layout. The hosted replay does not run a live Python backend.
 
 ## Clean submission check
 

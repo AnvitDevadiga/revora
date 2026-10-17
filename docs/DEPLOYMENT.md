@@ -1,6 +1,6 @@
 # Deployment
 
-Production replay: https://revora-graph-memory.vercel.app
+Production replay: https://revora-anvitdevadiga.vercel.app
 
 Project: `revora-graph-memory`, scope `anvitdevadiga`, Vercel Hobby.
 Verified production deployment: `dpl_FXQWNopG2G4jMCSZtpdtWhPhcgUS`.
