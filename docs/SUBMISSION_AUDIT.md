@@ -2,7 +2,7 @@
 
 Production frontend: https://revora-anvitdevadiga.vercel.app
 
-This is a verified replay deployment in the user’s Vercel Hobby account. The latest deployment (`dpl_HCW3fpThjHZ4uja3s3mrxoW5NGdu`) is READY and aliased to production. Chrome confirms the four-node incident → analyst handoff → persisted evidence review → planner path and the memory-on/stateless HTTP retry comparison. The hosted frontend contains no backend or database credentials.
+This is a verified replay deployment in the user’s Vercel Hobby account. The latest deployment (`dpl_3EnvZ5fFjHTAYaqh73bAGd1xsds8`) is READY and aliased to production. Chrome confirms the four-node incident → analyst handoff → persisted evidence review → planner path and the memory-on/stateless HTTP retry comparison. The hosted frontend contains no backend or database credentials.
 
 ## Verified in this session
 
