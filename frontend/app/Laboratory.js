@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import "./laboratory.css";
 
 export default function Laboratory({ request, api }) {
   const [scenario, setScenario] = useState("deployment");
@@ -21,7 +22,7 @@ export default function Laboratory({ request, api }) {
   }
   const step = result?.timeline[selected];
   return <section className="lab panel" aria-labelledby="lab-title">
-    <div className="panelhead"><h2 id="lab-title">Watch experience change a decision.</h2><span>Memory laboratory · simulated</span></div>
+    <div className="panelhead"><h2 id="lab-title">watch experience change a decision.</h2><span>memory laboratory · simulated</span></div>
     <p>Compare strategies in the same context. Inspect every change. Remove evidence to challenge the conclusion.</p>
     <div className="actions"><label htmlFor="scenario">Scenario</label><select id="scenario" value={scenario} onChange={e => setScenario(e.target.value)} disabled={busy}>
       <option value="deployment">The Friday deployment myth</option><option value="migration">The database migration incident</option>
@@ -39,14 +40,14 @@ export default function Laboratory({ request, api }) {
         <article><small>AFTER OBSERVATION {selected + 1}</small><h3>{step.after.action}</h3><p>{step.changed ? "Decision revised by this evidence" : "More evidence recorded; decision unchanged"}</p></article>
       </div>
       <div className="grid">
-        <div><h3>Contextual evidence</h3>{step.after.beliefs.map(belief => <article className="belief-card" key={belief.action}>
+        <div><h3 className="lab-subhead">contextual evidence</h3>{step.after.beliefs.map(belief => <article className="belief-card" key={belief.action}>
           <strong>{belief.action}</strong><span>{belief.successes} successful / {belief.failures} failed</span>
           <meter min="0" max="1" value={belief.score} aria-label={`${belief.action} evidence score`} />
           <small>Evidence score {belief.score} · {belief.evidence.length} linked observations</small>
         </article>)}</div>
-        <div><h3>Final sandbox run</h3>{result.trace.map(item => <div className="trace-row" key={item.role}><b>{item.role}</b><span>{typeof item.result === "string" ? item.result : `${item.result.action}: ${item.result.success ? "healthy" : "withheld / failed"} (simulated)`}</span></div>)}</div>
+        <div><h3 className="lab-subhead">final sandbox run</h3>{result.trace.map(item => <div className="trace-row" key={item.role}><b>{item.role}</b><span>{typeof item.result === "string" ? item.result : `${item.result.action}: ${item.result.success ? "healthy" : "withheld / failed"} (simulated)`}</span></div>)}</div>
       </div>
-      <details><summary>Would the final decision survive missing evidence?</summary>
+      <details><summary>would the final decision survive missing evidence?</summary>
         <p>Each row recomputes the decision with one observation removed. This tests sensitivity; it does not prove causation.</p>
         {result.ablations.map((entry, i) => <div className="trace-row" key={entry.removed}><b>Without observation {i + 1}</b><span>{entry.action} · {entry.changed ? "decision changes" : "decision stable"}</span></div>)}
       </details>

@@ -1,0 +1,413 @@
+/* ============================================================
+   memory dashboard — the live belief graph
+   ============================================================ */
+
+.memory-dashboard {
+  margin-top: 34px;
+  padding: clamp(20px, 3vw, 34px);
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-lg);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.014), transparent 42%),
+    var(--bg-1);
+}
+
+.memory-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.memory-heading h2 {
+  font-size: clamp(22px, 2.6vw, 30px);
+  letter-spacing: -0.03em;
+  margin-top: 13px;
+}
+
+.memory-heading p {
+  color: var(--text-1);
+  font-size: 13.5px;
+  margin: 9px 0 0;
+  max-width: 60ch;
+}
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 13px;
+  border: 1px solid rgba(84, 224, 179, 0.3);
+  border-radius: var(--r-full);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--mint);
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+
+.live-indicator i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mint);
+  box-shadow: 0 0 10px rgba(84, 224, 179, 0.6);
+  animation: softPulse 2.2s ease-in-out infinite;
+}
+
+.live-indicator span {
+  color: var(--text-2);
+  font-size: 9.5px;
+}
+
+/* ---------- layout ---------- */
+
+.memory-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1080px) {
+  .memory-layout { grid-template-columns: 1fr; }
+}
+
+/* ---------- graph card ---------- */
+
+.graph-card {
+  position: relative;
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-md);
+  background: rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+}
+
+.graph-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(148, 178, 209, 0.1) 1px, transparent 1.4px);
+  background-size: 24px 24px;
+  opacity: 0.4;
+}
+
+.graph-card-head {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px 20px 0;
+}
+
+.graph-card-head h3 {
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  margin-top: 9px;
+}
+
+.graph-subtitle {
+  display: block;
+  color: var(--text-2);
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.graph-count {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--text-2);
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+
+.graph-count i { font-style: normal; color: var(--mint-dim); }
+
+.graph-legend {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 15px 20px 0;
+}
+
+.graph-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.13em;
+  color: var(--text-2);
+  text-transform: lowercase;
+}
+
+.graph-legend i { width: 8px; height: 8px; border-radius: 3px; flex: none; }
+.legend-experience { background: #ff9378; }
+.legend-evidence { background: #82a9ff; }
+.legend-belief { background: #54e0b3; }
+.legend-conflict { background: #ff756d; border-radius: 2px; transform: rotate(45deg); }
+
+/* ---------- graph svg ---------- */
+
+.memory-graph {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 8px;
+}
+
+.graph-columns text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  fill: var(--text-2);
+}
+
+.graph-edge { transition: opacity var(--dur-3) var(--ease-out); }
+
+.edge-path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  animation: edgeDraw 0.7s var(--ease-out) backwards;
+  animation-delay: calc(var(--i) * 28ms + 140ms);
+}
+
+.graph-edge.contradicts .edge-path {
+  stroke-dasharray: 3 2.6;
+  animation: flashRed 1.5s var(--ease-out) 700ms 1 backwards;
+}
+
+@keyframes edgeDraw { from { stroke-dashoffset: 100; } }
+
+@keyframes flashRed {
+  0%, 100% { stroke: #ff756d; stroke-width: 1.6; }
+  30% { stroke: #ff2d2d; stroke-width: 3; }
+  60% { stroke: #ff756d; stroke-width: 1.6; }
+}
+
+.edge-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  fill: #8797ab;
+}
+
+.edge-label.contradicts { fill: #ff756d; }
+.edge-label.updates { fill: #c29aff; }
+
+.graph-node {
+  cursor: default;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: nodeIn 0.55s var(--ease-out) backwards;
+  animation-delay: calc(var(--i) * 45ms);
+  transition: opacity var(--dur-3) var(--ease-out);
+}
+
+@keyframes nodeIn {
+  from { opacity: 0; transform: scale(0.96); }
+}
+
+.node-halo {
+  fill: none;
+  stroke: rgba(84, 224, 179, 0.4);
+  stroke-width: 1.2;
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+
+.graph-node.pulse .node-halo { animation: haloPulse 4.4s ease-in-out 1.6s infinite; }
+
+@keyframes haloPulse {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(1.14); }
+}
+
+.graph-node rect { transition: stroke var(--dur-2) var(--ease-out), filter var(--dur-2) var(--ease-out); }
+.graph-node:hover rect { filter: drop-shadow(0 0 10px rgba(84, 224, 179, 0.2)); }
+
+.graph-node:focus { outline: none; }
+.graph-node:focus-visible rect { stroke: #54e0b3; }
+
+.graph-node text {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  fill: #eef3f9;
+}
+
+.graph-node .node-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: #6b7d93;
+}
+
+.dimmed { opacity: 0.32; }
+
+/* ---------- empty state ---------- */
+
+.graph-empty {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 74px 20px 84px;
+  text-align: center;
+}
+
+.empty-orbit {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 86px;
+  height: 86px;
+  margin-bottom: 16px;
+}
+
+.empty-orbit::before,
+.empty-orbit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px dashed var(--line-1);
+  animation: spin 24s linear infinite;
+}
+
+.empty-orbit::after {
+  inset: 15px;
+  border-style: solid;
+  border-color: var(--line-0);
+  animation-duration: 17s;
+  animation-direction: reverse;
+}
+
+.empty-orbit span {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  color: var(--mint);
+}
+
+.graph-empty strong { font-size: 14.5px; letter-spacing: -0.01em; }
+.graph-empty p { color: var(--text-2); font-size: 12.5px; margin: 0; max-width: 42ch; }
+
+/* ---------- sidebar ---------- */
+
+.belief-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.belief-summary {
+  position: relative;
+  padding: 20px;
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.012);
+  overflow: hidden;
+}
+
+.belief-summary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(230px 130px at 18% 0%, rgba(84, 224, 179, 0.07), transparent 70%);
+}
+
+.belief-summary strong {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 42px;
+  font-weight: 550;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 12px 0 3px;
+  color: var(--mint);
+}
+
+.belief-summary > span { color: var(--text-2); font-size: 12px; }
+
+.belief-state-foot {
+  display: flex;
+  gap: 16px;
+  margin-top: 15px;
+  padding-top: 13px;
+  border-top: 1px solid var(--line-0);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-2);
+  text-transform: lowercase;
+}
+
+.belief-state-foot span:first-child { color: var(--mint); }
+.belief-state-foot span:last-child { color: var(--violet); }
+
+.history-card {
+  padding: 18px 20px;
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.012);
+}
+
+.history-card h3 { font-size: 14px; margin: 11px 0 4px; }
+
+.history-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line-0);
+}
+
+.history-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+.history-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+}
+
+.history-dot.success { background: var(--mint); box-shadow: 0 0 8px rgba(84, 224, 179, 0.45); }
+.history-dot.failure { background: var(--fault); box-shadow: 0 0 8px rgba(255, 117, 109, 0.45); }
+
+.history-item strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 560;
+  letter-spacing: 0;
+}
+
+.history-item p { color: var(--text-2); font-size: 12px; margin: 3px 0; }
+
+.history-item small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: var(--text-2);
+  text-transform: lowercase;
+}
+
+.history-item time {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-2);
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+.history-empty { color: var(--text-2); font-size: 12.5px; }

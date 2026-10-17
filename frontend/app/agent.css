@@ -1,0 +1,113 @@
+/* ============================================================
+   agent — the streaming execution feed
+   ============================================================ */
+
+.live-feed {
+  margin-top: 22px;
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-md);
+  background: rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+}
+
+.feed-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line-0);
+}
+
+.feed-pulse {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.15em;
+  color: var(--mint);
+  border: 1px solid rgba(84, 224, 179, 0.35);
+  border-radius: var(--r-full);
+  padding: 4px 10px;
+  text-transform: lowercase;
+  animation: softPulse 1.6s ease-in-out infinite;
+}
+
+.feed-step {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line-0);
+  animation: fadeUp 0.35s var(--ease-out) both;
+}
+
+.feed-step:last-child { border-bottom: none; }
+
+.feed-step-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.feed-step-head i {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--text-2);
+  transition: background var(--dur-3), box-shadow var(--dur-3);
+}
+
+.feed-step.running .feed-step-head i {
+  background: var(--mint);
+  box-shadow: 0 0 10px rgba(84, 224, 179, 0.6);
+  animation: softPulse 1.2s ease-in-out infinite;
+}
+
+.feed-step.complete .feed-step-head i { background: var(--mint-dim); }
+
+.feed-step-head strong {
+  font-size: 13px;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+}
+
+.feed-step-head small {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.13em;
+  color: var(--text-2);
+  text-transform: lowercase;
+}
+
+.feed-step pre {
+  margin: 11px 0 0;
+  padding: 13px;
+  border-radius: var(--r-sm);
+  background: rgba(0, 0, 0, 0.3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--text-1);
+  overflow: auto;
+  max-height: 220px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.decision-promote {
+  color: var(--mint);
+  letter-spacing: -0.01em;
+}
+
+.decision-rollback {
+  color: var(--fault);
+  letter-spacing: -0.01em;
+}
+
+.lab code {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--mint);
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid var(--line-0);
+  border-radius: 4px;
+  padding: 1px 6px;
+}

@@ -1,0 +1,3775 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-17T09:52:05.496560+00:00",
+  "verification": "Passed against a real local FalkorDB instance, a restarted FastAPI backend, and project-owned HTTP services",
+  "limitations": "Recorded local acceptance evidence. HTTP faults are intentionally injected; all migration data is synthetic. This public replay does not operate a hosted backend.",
+  "checks": {
+    "live_200_503_200": true,
+    "memory_blocks_retry": true,
+    "fresh_process_handoff": true,
+    "backend_restart_restores_active_incident": true,
+    "actual_fastapi_recovery_route": true,
+    "graph_evidence_cycle": true,
+    "receiver_requests_missing_or_rejects_contradictory_evidence": true,
+    "review_decision_is_graph_node": true,
+    "persistent_memory_prevents_repeat_503": true,
+    "repeated_ablation_isolated": true,
+    "consequential_separate_process_recovery": true,
+    "graph_edge_ablation": true,
+    "adversarial_memory_rejection": true,
+    "scoped_contradiction_semantics": true,
+    "failed_mutation_preserves_state": true,
+    "interrupted_handoff_resumes_without_repeating_recovery": true
+  },
+  "release": {
+    "baseline": {
+      "service": "revora-demo",
+      "active_route": "stable",
+      "candidate_version": "v0",
+      "candidate_mode": "healthy",
+      "incident_active": false,
+      "target_mode": "project_demo",
+      "traffic_endpoint": "/api/release/traffic",
+      "gateway_probe": {
+        "status": 200,
+        "latency_ms": 10.46,
+        "version": "stable",
+        "route": "stable"
+      }
+    },
+    "onset": {
+      "id": "245bee70-b2c8-4b0b-aeb3-eb450a9f99a9",
+      "service": "revora-demo",
+      "version": "acceptance-v1",
+      "timestamp": "2026-10-17T09:51:58.665050+00:00",
+      "measurement_mode": "live_gateway",
+      "before": {
+        "status": 200,
+        "latency_ms": 0.5,
+        "version": "stable",
+        "route": "stable"
+      },
+      "prior_evidence": null,
+      "canary_samples": [],
+      "recovery_samples": [],
+      "decision": "introduced",
+      "failed": true,
+      "during": {
+        "status": 503,
+        "latency_ms": 0.46,
+        "version": "acceptance-v1",
+        "route": "candidate"
+      },
+      "reason": "Candidate fault is active on the live gateway. Recovery has not run.",
+      "onset_id": ""
+    },
+    "diagnosis": {
+      "id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+      "service": "revora-demo",
+      "version": "acceptance-v1",
+      "timestamp": "2026-10-17T09:51:58.676881+00:00",
+      "measurement_mode": "live_gateway",
+      "before": {
+        "status": 200,
+        "latency_ms": 0.5,
+        "version": "stable",
+        "route": "stable"
+      },
+      "prior_evidence": {
+        "id": "245bee70-b2c8-4b0b-aeb3-eb450a9f99a9",
+        "timestamp": "2026-10-17T09:51:58.665050+00:00"
+      },
+      "canary_samples": [
+        {
+          "status": 503,
+          "latency_ms": 0.45,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.44,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.41,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.37,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.4,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.36,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.43,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.38,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.36,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.37,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.43,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.45,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        }
+      ],
+      "recovery_samples": [],
+      "decision": "diagnosed",
+      "failed": true,
+      "during": {
+        "status": 503,
+        "latency_ms": 0.46,
+        "version": "acceptance-v1",
+        "route": "candidate"
+      },
+      "reason": "Investigator measured live incident; no recovery action has executed.",
+      "onset_id": "245bee70-b2c8-4b0b-aeb3-eb450a9f99a9",
+      "metrics": {
+        "sample_count": 12,
+        "error_rate": 1.0,
+        "p95_latency_ms": 0.45,
+        "percentile_method": "nearest_rank",
+        "max_error_rate": 0.05,
+        "max_p95_latency_ms": 120,
+        "failed": true
+      }
+    },
+    "recovered": {
+      "id": "30aa79b9-13d0-4903-a806-338ad81fe5e7",
+      "service": "revora-demo",
+      "version": "acceptance-v1",
+      "timestamp": "2026-10-17T09:52:00.116168+00:00",
+      "measurement_mode": "live_gateway",
+      "before": {
+        "status": 200,
+        "latency_ms": 0.5,
+        "version": "stable",
+        "route": "stable"
+      },
+      "prior_evidence": {
+        "id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "timestamp": "2026-10-17T09:51:58.676881+00:00"
+      },
+      "canary_samples": [
+        {
+          "status": 503,
+          "latency_ms": 0.45,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.44,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.41,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.37,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.4,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.36,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.43,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.38,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.36,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.37,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.43,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.45,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        }
+      ],
+      "recovery_samples": [
+        {
+          "status": 200,
+          "latency_ms": 7.69,
+          "version": "stable",
+          "route": "stable"
+        },
+        {
+          "status": 200,
+          "latency_ms": 0.53,
+          "version": "stable",
+          "route": "stable"
+        },
+        {
+          "status": 200,
+          "latency_ms": 0.47,
+          "version": "stable",
+          "route": "stable"
+        }
+      ],
+      "decision": "rollback",
+      "failed": true,
+      "during": {
+        "status": 503,
+        "latency_ms": 0.46,
+        "version": "acceptance-v1",
+        "route": "candidate"
+      },
+      "reason": "Measured the live failure, restored the stable route, and verified healthy requests.",
+      "onset_id": "245bee70-b2c8-4b0b-aeb3-eb450a9f99a9",
+      "handoff_id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+      "diagnosis_id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+      "metrics": {
+        "sample_count": 12,
+        "error_rate": 1.0,
+        "p95_latency_ms": 0.45,
+        "percentile_method": "nearest_rank",
+        "max_error_rate": 0.05,
+        "max_p95_latency_ms": 120,
+        "failed": true
+      },
+      "after": {
+        "status": 200,
+        "latency_ms": 0.46,
+        "version": "stable",
+        "route": "stable"
+      },
+      "recovered": true
+    },
+    "blocked": {
+      "id": "ab6852be-a00a-4dc9-887e-97ca06fbf90f",
+      "service": "revora-demo",
+      "version": "acceptance-v1",
+      "timestamp": "2026-10-17T09:52:01.224851+00:00",
+      "measurement_mode": "live_gateway",
+      "before": {
+        "status": 200,
+        "latency_ms": 1.39,
+        "version": "stable",
+        "route": "stable"
+      },
+      "prior_evidence": {
+        "id": "30aa79b9-13d0-4903-a806-338ad81fe5e7",
+        "timestamp": "2026-10-17T09:52:00.116168+00:00"
+      },
+      "canary_samples": [],
+      "recovery_samples": [],
+      "decision": "blocked_from_memory",
+      "failed": true,
+      "after": {
+        "status": 200,
+        "latency_ms": 0.87,
+        "version": "stable",
+        "route": "stable"
+      },
+      "reason": "FalkorDB contains a measured failure for this exact version; it was not activated.",
+      "onset_id": "30aa79b9-13d0-4903-a806-338ad81fe5e7"
+    }
+  },
+  "coordination": {
+    "handoff": {
+      "id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+      "type": "AgentHandoff",
+      "from_agent": "release_analyst",
+      "to_agent": "recovery_planner",
+      "created_at": "2026-10-17T09:51:58.680624+00:00",
+      "evidence": {
+        "incident_id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "service": "revora-demo",
+        "version": "acceptance-v1",
+        "decision": "diagnosed",
+        "onset_id": "245bee70-b2c8-4b0b-aeb3-eb450a9f99a9",
+        "failed": true,
+        "status_before": 200,
+        "status_during": 503,
+        "status_after": null,
+        "sample_count": 12,
+        "reported_sample_count": 12,
+        "canary_statuses": [
+          503,
+          503,
+          503,
+          503,
+          503,
+          503,
+          503,
+          503,
+          503,
+          503,
+          503,
+          503
+        ],
+        "canary_latencies_ms": [
+          0.45,
+          0.44,
+          0.41,
+          0.37,
+          0.4,
+          0.36,
+          0.43,
+          0.38,
+          0.36,
+          0.37,
+          0.43,
+          0.45
+        ],
+        "metrics": {
+          "sample_count": 12,
+          "error_rate": 1.0,
+          "p95_latency_ms": 0.45,
+          "percentile_method": "nearest_rank",
+          "max_error_rate": 0.05,
+          "max_p95_latency_ms": 120,
+          "failed": true
+        },
+        "measurement_mode": "live_gateway"
+      }
+    },
+    "plan": {
+      "id": "96522045-d242-44d6-99b0-39d625d2cee7",
+      "type": "CoordinationDecision",
+      "agent": "recovery_planner",
+      "handoff_id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+      "action": "rollback_and_verify",
+      "reason": "Measured failure or prior failed version requires stable routing and health verification.",
+      "based_on": [
+        "8eebd3ae-ef94-4d46-878f-4775653c21c6"
+      ],
+      "prior_handoff_id": null,
+      "memory_enabled": true,
+      "evidence_review_id": "c23f46c9-d529-4ac6-83d3-12ba973cf3fd",
+      "evidence_review": {
+        "status": "accepted",
+        "requested_evidence": [],
+        "contradictions": []
+      },
+      "execution": {
+        "id": "30aa79b9-13d0-4903-a806-338ad81fe5e7",
+        "service": "revora-demo",
+        "version": "acceptance-v1",
+        "timestamp": "2026-10-17T09:52:00.116168+00:00",
+        "measurement_mode": "live_gateway",
+        "before": {
+          "status": 200,
+          "latency_ms": 0.5,
+          "version": "stable",
+          "route": "stable"
+        },
+        "prior_evidence": {
+          "id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+          "timestamp": "2026-10-17T09:51:58.676881+00:00"
+        },
+        "canary_samples": [
+          {
+            "status": 503,
+            "latency_ms": 0.45,
+            "version": "acceptance-v1",
+            "route": "candidate"
+          },
+          {
+            "status": 503,
+            "latency_ms": 0.44,
+            "version": "acceptance-v1",
+            "route": "candidate"
+          },
+          {
+            "status": 503,
+            "latency_ms": 0.41,
+            "version": "acceptance-v1",
+            "route": "candidate"
+          },
+          {
+            "status": 503,
+            "latency_ms": 0.37,
+            "version": "acceptance-v1",
+            "route": "candidate"
+          },
+          {
+            "status": 503,
+            "latency_ms": 0.4,
+            "version": "acceptance-v1",
+            "route": "candidate"
+          },
+          {
+            "status": 503,
+            "latency_ms": 0.36,
+            "version": "acceptance-v1",
+            "route": "candidate"
+          },
+          {
+            "status": 503,
+            "latency_ms": 0.43,
+            "version": "acceptance-v1",
+            "route": "candidate"
+          },
+          {
+            "status": 503,
+            "latency_ms": 0.38,
+            "version": "acceptance-v1",
+            "route": "candidate"
+          },
+          {
+            "status": 503,
+            "latency_ms": 0.36,
+            "version": "acceptance-v1",
+            "route": "candidate"
+          },
+          {
+            "status": 503,
+            "latency_ms": 0.37,
+            "version": "acceptance-v1",
+            "route": "candidate"
+          },
+          {
+            "status": 503,
+            "latency_ms": 0.43,
+            "version": "acceptance-v1",
+            "route": "candidate"
+          },
+          {
+            "status": 503,
+            "latency_ms": 0.45,
+            "version": "acceptance-v1",
+            "route": "candidate"
+          }
+        ],
+        "recovery_samples": [
+          {
+            "status": 200,
+            "latency_ms": 7.69,
+            "version": "stable",
+            "route": "stable"
+          },
+          {
+            "status": 200,
+            "latency_ms": 0.53,
+            "version": "stable",
+            "route": "stable"
+          },
+          {
+            "status": 200,
+            "latency_ms": 0.47,
+            "version": "stable",
+            "route": "stable"
+          }
+        ],
+        "decision": "rollback",
+        "failed": true,
+        "during": {
+          "status": 503,
+          "latency_ms": 0.46,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        "reason": "Measured the live failure, restored the stable route, and verified healthy requests.",
+        "onset_id": "245bee70-b2c8-4b0b-aeb3-eb450a9f99a9",
+        "handoff_id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+        "diagnosis_id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "metrics": {
+          "sample_count": 12,
+          "error_rate": 1.0,
+          "p95_latency_ms": 0.45,
+          "percentile_method": "nearest_rank",
+          "max_error_rate": 0.05,
+          "max_p95_latency_ms": 120,
+          "failed": true
+        },
+        "after": {
+          "status": 200,
+          "latency_ms": 0.46,
+          "version": "stable",
+          "route": "stable"
+        },
+        "recovered": true
+      },
+      "execution_status": "verified"
+    },
+    "trace": [
+      {
+        "agent": "release_analyst",
+        "step": "publish_measured_incident",
+        "output": {
+          "incident_id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+          "service": "revora-demo",
+          "version": "acceptance-v1",
+          "decision": "diagnosed",
+          "onset_id": "245bee70-b2c8-4b0b-aeb3-eb450a9f99a9",
+          "failed": true,
+          "status_before": 200,
+          "status_during": 503,
+          "status_after": null,
+          "sample_count": 12,
+          "reported_sample_count": 12,
+          "canary_statuses": [
+            503,
+            503,
+            503,
+            503,
+            503,
+            503,
+            503,
+            503,
+            503,
+            503,
+            503,
+            503
+          ],
+          "canary_latencies_ms": [
+            0.45,
+            0.44,
+            0.41,
+            0.37,
+            0.4,
+            0.36,
+            0.43,
+            0.38,
+            0.36,
+            0.37,
+            0.43,
+            0.45
+          ],
+          "metrics": {
+            "sample_count": 12,
+            "error_rate": 1.0,
+            "p95_latency_ms": 0.45,
+            "percentile_method": "nearest_rank",
+            "max_error_rate": 0.05,
+            "max_p95_latency_ms": 120,
+            "failed": true
+          },
+          "measurement_mode": "live_gateway"
+        }
+      },
+      {
+        "agent": "evidence_reviewer",
+        "step": "validate_measurements",
+        "output": {
+          "status": "accepted",
+          "requested_evidence": [],
+          "contradictions": []
+        }
+      },
+      {
+        "agent": "recovery_planner",
+        "step": "read_persisted_handoff",
+        "input_handoff_id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+        "retrieved_prior_handoff": null,
+        "output": {
+          "id": "96522045-d242-44d6-99b0-39d625d2cee7",
+          "type": "CoordinationDecision",
+          "agent": "recovery_planner",
+          "handoff_id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+          "action": "rollback_and_verify",
+          "reason": "Measured failure or prior failed version requires stable routing and health verification.",
+          "based_on": [
+            "8eebd3ae-ef94-4d46-878f-4775653c21c6"
+          ],
+          "prior_handoff_id": null,
+          "memory_enabled": true,
+          "evidence_review_id": "c23f46c9-d529-4ac6-83d3-12ba973cf3fd",
+          "evidence_review": {
+            "status": "accepted",
+            "requested_evidence": [],
+            "contradictions": []
+          },
+          "execution": {
+            "id": "30aa79b9-13d0-4903-a806-338ad81fe5e7",
+            "service": "revora-demo",
+            "version": "acceptance-v1",
+            "timestamp": "2026-10-17T09:52:00.116168+00:00",
+            "measurement_mode": "live_gateway",
+            "before": {
+              "status": 200,
+              "latency_ms": 0.5,
+              "version": "stable",
+              "route": "stable"
+            },
+            "prior_evidence": {
+              "id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+              "timestamp": "2026-10-17T09:51:58.676881+00:00"
+            },
+            "canary_samples": [
+              {
+                "status": 503,
+                "latency_ms": 0.45,
+                "version": "acceptance-v1",
+                "route": "candidate"
+              },
+              {
+                "status": 503,
+                "latency_ms": 0.44,
+                "version": "acceptance-v1",
+                "route": "candidate"
+              },
+              {
+                "status": 503,
+                "latency_ms": 0.41,
+                "version": "acceptance-v1",
+                "route": "candidate"
+              },
+              {
+                "status": 503,
+                "latency_ms": 0.37,
+                "version": "acceptance-v1",
+                "route": "candidate"
+              },
+              {
+                "status": 503,
+                "latency_ms": 0.4,
+                "version": "acceptance-v1",
+                "route": "candidate"
+              },
+              {
+                "status": 503,
+                "latency_ms": 0.36,
+                "version": "acceptance-v1",
+                "route": "candidate"
+              },
+              {
+                "status": 503,
+                "latency_ms": 0.43,
+                "version": "acceptance-v1",
+                "route": "candidate"
+              },
+              {
+                "status": 503,
+                "latency_ms": 0.38,
+                "version": "acceptance-v1",
+                "route": "candidate"
+              },
+              {
+                "status": 503,
+                "latency_ms": 0.36,
+                "version": "acceptance-v1",
+                "route": "candidate"
+              },
+              {
+                "status": 503,
+                "latency_ms": 0.37,
+                "version": "acceptance-v1",
+                "route": "candidate"
+              },
+              {
+                "status": 503,
+                "latency_ms": 0.43,
+                "version": "acceptance-v1",
+                "route": "candidate"
+              },
+              {
+                "status": 503,
+                "latency_ms": 0.45,
+                "version": "acceptance-v1",
+                "route": "candidate"
+              }
+            ],
+            "recovery_samples": [
+              {
+                "status": 200,
+                "latency_ms": 7.69,
+                "version": "stable",
+                "route": "stable"
+              },
+              {
+                "status": 200,
+                "latency_ms": 0.53,
+                "version": "stable",
+                "route": "stable"
+              },
+              {
+                "status": 200,
+                "latency_ms": 0.47,
+                "version": "stable",
+                "route": "stable"
+              }
+            ],
+            "decision": "rollback",
+            "failed": true,
+            "during": {
+              "status": 503,
+              "latency_ms": 0.46,
+              "version": "acceptance-v1",
+              "route": "candidate"
+            },
+            "reason": "Measured the live failure, restored the stable route, and verified healthy requests.",
+            "onset_id": "245bee70-b2c8-4b0b-aeb3-eb450a9f99a9",
+            "handoff_id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+            "diagnosis_id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+            "metrics": {
+              "sample_count": 12,
+              "error_rate": 1.0,
+              "p95_latency_ms": 0.45,
+              "percentile_method": "nearest_rank",
+              "max_error_rate": 0.05,
+              "max_p95_latency_ms": 120,
+              "failed": true
+            },
+            "after": {
+              "status": 200,
+              "latency_ms": 0.46,
+              "version": "stable",
+              "route": "stable"
+            },
+            "recovered": true
+          },
+          "execution_status": "verified"
+        }
+      }
+    ],
+    "provenance": {
+      "source_incident_id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+      "source": "persisted_graph_handoff",
+      "measurement_mode": "live_gateway"
+    },
+    "execution": {
+      "id": "30aa79b9-13d0-4903-a806-338ad81fe5e7",
+      "service": "revora-demo",
+      "version": "acceptance-v1",
+      "timestamp": "2026-10-17T09:52:00.116168+00:00",
+      "measurement_mode": "live_gateway",
+      "before": {
+        "status": 200,
+        "latency_ms": 0.5,
+        "version": "stable",
+        "route": "stable"
+      },
+      "prior_evidence": {
+        "id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "timestamp": "2026-10-17T09:51:58.676881+00:00"
+      },
+      "canary_samples": [
+        {
+          "status": 503,
+          "latency_ms": 0.45,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.44,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.41,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.37,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.4,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.36,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.43,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.38,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.36,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.37,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.43,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.45,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        }
+      ],
+      "recovery_samples": [
+        {
+          "status": 200,
+          "latency_ms": 7.69,
+          "version": "stable",
+          "route": "stable"
+        },
+        {
+          "status": 200,
+          "latency_ms": 0.53,
+          "version": "stable",
+          "route": "stable"
+        },
+        {
+          "status": 200,
+          "latency_ms": 0.47,
+          "version": "stable",
+          "route": "stable"
+        }
+      ],
+      "decision": "rollback",
+      "failed": true,
+      "during": {
+        "status": 503,
+        "latency_ms": 0.46,
+        "version": "acceptance-v1",
+        "route": "candidate"
+      },
+      "reason": "Measured the live failure, restored the stable route, and verified healthy requests.",
+      "onset_id": "245bee70-b2c8-4b0b-aeb3-eb450a9f99a9",
+      "handoff_id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+      "diagnosis_id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+      "metrics": {
+        "sample_count": 12,
+        "error_rate": 1.0,
+        "p95_latency_ms": 0.45,
+        "percentile_method": "nearest_rank",
+        "max_error_rate": 0.05,
+        "max_p95_latency_ms": 120,
+        "failed": true
+      },
+      "after": {
+        "status": 200,
+        "latency_ms": 0.46,
+        "version": "stable",
+        "route": "stable"
+      },
+      "recovered": true
+    },
+    "recovery": {
+      "id": "30aa79b9-13d0-4903-a806-338ad81fe5e7",
+      "service": "revora-demo",
+      "version": "acceptance-v1",
+      "timestamp": "2026-10-17T09:52:00.116168+00:00",
+      "measurement_mode": "live_gateway",
+      "before": {
+        "status": 200,
+        "latency_ms": 0.5,
+        "version": "stable",
+        "route": "stable"
+      },
+      "prior_evidence": {
+        "id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "timestamp": "2026-10-17T09:51:58.676881+00:00"
+      },
+      "canary_samples": [
+        {
+          "status": 503,
+          "latency_ms": 0.45,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.44,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.41,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.37,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.4,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.36,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.43,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.38,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.36,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.37,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.43,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        },
+        {
+          "status": 503,
+          "latency_ms": 0.45,
+          "version": "acceptance-v1",
+          "route": "candidate"
+        }
+      ],
+      "recovery_samples": [
+        {
+          "status": 200,
+          "latency_ms": 7.69,
+          "version": "stable",
+          "route": "stable"
+        },
+        {
+          "status": 200,
+          "latency_ms": 0.53,
+          "version": "stable",
+          "route": "stable"
+        },
+        {
+          "status": 200,
+          "latency_ms": 0.47,
+          "version": "stable",
+          "route": "stable"
+        }
+      ],
+      "decision": "rollback",
+      "failed": true,
+      "during": {
+        "status": 503,
+        "latency_ms": 0.46,
+        "version": "acceptance-v1",
+        "route": "candidate"
+      },
+      "reason": "Measured the live failure, restored the stable route, and verified healthy requests.",
+      "onset_id": "245bee70-b2c8-4b0b-aeb3-eb450a9f99a9",
+      "handoff_id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+      "diagnosis_id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+      "metrics": {
+        "sample_count": 12,
+        "error_rate": 1.0,
+        "p95_latency_ms": 0.45,
+        "percentile_method": "nearest_rank",
+        "max_error_rate": 0.05,
+        "max_p95_latency_ms": 120,
+        "failed": true
+      },
+      "after": {
+        "status": 200,
+        "latency_ms": 0.46,
+        "version": "stable",
+        "route": "stable"
+      },
+      "recovered": true
+    }
+  },
+  "next_agent": {
+    "handoff": {
+      "id": "204bdb82-d5bc-4cc6-85b3-7a266c94ca61",
+      "type": "AgentHandoff",
+      "from_agent": "release_analyst",
+      "to_agent": "recovery_planner",
+      "created_at": "2026-10-17T09:52:01.229249+00:00",
+      "evidence": {
+        "incident_id": "ab6852be-a00a-4dc9-887e-97ca06fbf90f",
+        "service": "revora-demo",
+        "version": "acceptance-v1",
+        "decision": "blocked_from_memory",
+        "onset_id": "30aa79b9-13d0-4903-a806-338ad81fe5e7",
+        "failed": true,
+        "status_before": 200,
+        "status_during": null,
+        "status_after": 200,
+        "sample_count": 0,
+        "reported_sample_count": 0,
+        "canary_statuses": [],
+        "canary_latencies_ms": [],
+        "metrics": {},
+        "measurement_mode": "live_gateway"
+      }
+    },
+    "plan": {
+      "id": "87723512-4da0-4250-aab2-102a130115d6",
+      "type": "CoordinationDecision",
+      "agent": "recovery_planner",
+      "handoff_id": "204bdb82-d5bc-4cc6-85b3-7a266c94ca61",
+      "action": "keep_stable_and_verify",
+      "reason": "Measured failure or prior failed version requires stable routing and health verification.",
+      "based_on": [
+        "ab6852be-a00a-4dc9-887e-97ca06fbf90f"
+      ],
+      "prior_handoff_id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+      "memory_enabled": true,
+      "evidence_review_id": "90b5c964-3732-4ea4-8045-9a3689402403",
+      "evidence_review": {
+        "status": "accepted",
+        "requested_evidence": [],
+        "contradictions": []
+      },
+      "execution": null,
+      "execution_status": "planned"
+    },
+    "trace": [
+      {
+        "agent": "release_analyst",
+        "step": "publish_measured_incident",
+        "output": {
+          "incident_id": "ab6852be-a00a-4dc9-887e-97ca06fbf90f",
+          "service": "revora-demo",
+          "version": "acceptance-v1",
+          "decision": "blocked_from_memory",
+          "onset_id": "30aa79b9-13d0-4903-a806-338ad81fe5e7",
+          "failed": true,
+          "status_before": 200,
+          "status_during": null,
+          "status_after": 200,
+          "sample_count": 0,
+          "reported_sample_count": 0,
+          "canary_statuses": [],
+          "canary_latencies_ms": [],
+          "metrics": {},
+          "measurement_mode": "live_gateway"
+        }
+      },
+      {
+        "agent": "evidence_reviewer",
+        "step": "validate_measurements",
+        "output": {
+          "status": "accepted",
+          "requested_evidence": [],
+          "contradictions": []
+        }
+      },
+      {
+        "agent": "recovery_planner",
+        "step": "read_persisted_handoff",
+        "input_handoff_id": "204bdb82-d5bc-4cc6-85b3-7a266c94ca61",
+        "retrieved_prior_handoff": {
+          "handoff_id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+          "action": "rollback_and_verify"
+        },
+        "output": {
+          "id": "87723512-4da0-4250-aab2-102a130115d6",
+          "type": "CoordinationDecision",
+          "agent": "recovery_planner",
+          "handoff_id": "204bdb82-d5bc-4cc6-85b3-7a266c94ca61",
+          "action": "keep_stable_and_verify",
+          "reason": "Measured failure or prior failed version requires stable routing and health verification.",
+          "based_on": [
+            "ab6852be-a00a-4dc9-887e-97ca06fbf90f"
+          ],
+          "prior_handoff_id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+          "memory_enabled": true,
+          "evidence_review_id": "90b5c964-3732-4ea4-8045-9a3689402403",
+          "evidence_review": {
+            "status": "accepted",
+            "requested_evidence": [],
+            "contradictions": []
+          },
+          "execution": null,
+          "execution_status": "planned"
+        }
+      }
+    ],
+    "provenance": {
+      "source_incident_id": "ab6852be-a00a-4dc9-887e-97ca06fbf90f",
+      "source": "persisted_graph_handoff",
+      "measurement_mode": "live_gateway"
+    },
+    "execution": null,
+    "recovery": null
+  },
+  "evidence_review_tests": {
+    "missing": {
+      "status": "needs_evidence",
+      "requested_evidence": [
+        "at least 12 paired canary status and latency samples"
+      ],
+      "contradictions": []
+    },
+    "contradictory": {
+      "status": "rejected",
+      "requested_evidence": [],
+      "contradictions": [
+        "reported error rate does not match the raw samples",
+        "reported p95 latency does not match the raw samples",
+        "release decision conflicts with the measured error and latency gates"
+      ]
+    }
+  },
+  "learning_proof": {
+    "cohort": "proof-93f8984454a7",
+    "task": "Migrate a customer identity table to unique emails without losing or orphaning invoice records.",
+    "cold_run": {
+      "id": "proof-93f8984454a7-cold",
+      "fingerprint": "1d4dd98782a6751e0fd195562208b48f2f5abac3b441a243473db5fe9c70dd7f",
+      "context": "{\"environment\": \"sandbox\", \"service\": \"customer-registry-324b7e65\", \"workload\": \"invoice-preserving-identity-migration\"}",
+      "created_at": "2026-10-17T09:52:01.292034+00:00",
+      "goal": "Create a unique customer email index in a disposable database",
+      "initial": {
+        "action": "create_unique_index",
+        "beliefs": [
+          {
+            "action": "create_unique_index",
+            "score": 0.5,
+            "successes": 0,
+            "failures": 0,
+            "evidence": []
+          },
+          {
+            "action": "deduplicate_then_index",
+            "score": 0.5,
+            "successes": 0,
+            "failures": 0,
+            "evidence": []
+          }
+        ],
+        "evidence": [],
+        "reason": "Highest success score in this exact context; ties favor no row deletion."
+      },
+      "events": [
+        {
+          "id": "proof-93f8984454a7-cold:0",
+          "action": "create_unique_index",
+          "outcome": {
+            "success": false,
+            "rows_before": 6,
+            "rows_after": 6,
+            "rows_removed": 0,
+            "index_created": false,
+            "invoice_count_before": 12,
+            "invoice_count_after": 12,
+            "invoice_total_cents_before": 10128,
+            "invoice_total_cents_after": 10128,
+            "invoice_references_relinked": 0,
+            "invariants": {
+              "failed_transaction_rolled_back": true,
+              "all_invoices_preserved": true,
+              "invoice_value_preserved": true
+            },
+            "detail": "UNIQUE constraint failed: customers.email"
+          },
+          "before": {
+            "action": "create_unique_index",
+            "beliefs": [
+              {
+                "action": "create_unique_index",
+                "score": 0.5,
+                "successes": 0,
+                "failures": 0,
+                "evidence": []
+              },
+              {
+                "action": "deduplicate_then_index",
+                "score": 0.5,
+                "successes": 0,
+                "failures": 0,
+                "evidence": []
+              }
+            ],
+            "evidence": [],
+            "reason": "Highest success score in this exact context; ties favor no row deletion."
+          },
+          "after": {
+            "action": "request_review",
+            "beliefs": [
+              {
+                "action": "create_unique_index",
+                "score": 0.3333333333333333,
+                "successes": 0,
+                "failures": 1,
+                "evidence": [
+                  "proof-93f8984454a7-cold:0"
+                ]
+              },
+              {
+                "action": "deduplicate_then_index",
+                "score": 0.5,
+                "successes": 0,
+                "failures": 0,
+                "evidence": []
+              }
+            ],
+            "evidence": [
+              "proof-93f8984454a7-cold:0"
+            ],
+            "reason": "Known direct failure without an applicable, authorized procedure path; request review."
+          }
+        },
+        {
+          "id": "proof-93f8984454a7-cold:1",
+          "action": "deduplicate_then_index",
+          "outcome": {
+            "success": true,
+            "rows_before": 6,
+            "rows_after": 4,
+            "rows_removed": 2,
+            "index_created": true,
+            "invoice_count_before": 12,
+            "invoice_count_after": 12,
+            "invoice_total_cents_before": 10128,
+            "invoice_total_cents_after": 10128,
+            "invoice_references_relinked": 4,
+            "merge_audit_value_cents": 3839,
+            "invariants": {
+              "unique_identity": true,
+              "all_invoices_preserved": true,
+              "invoice_value_preserved": true,
+              "no_orphaned_invoice_references": true
+            },
+            "detail": "Identity merge and unique index verified; invoice references and totals preserved."
+          },
+          "verified_procedure_id": "989c04455eecf6a93ac85d74e3cc750080307b601ff9273944c23ad8f632a8ca",
+          "before": {
+            "action": "deduplicate_then_index",
+            "beliefs": [
+              {
+                "action": "create_unique_index",
+                "score": 0.3333333333333333,
+                "successes": 0,
+                "failures": 1,
+                "evidence": [
+                  "proof-93f8984454a7-cold:0"
+                ]
+              },
+              {
+                "action": "deduplicate_then_index",
+                "score": 0.5,
+                "successes": 0,
+                "failures": 0,
+                "evidence": []
+              }
+            ],
+            "evidence": [],
+            "reason": "Current tool failure overrides historical preference; never repeat a failed tool on unchanged input."
+          },
+          "after": {
+            "action": "deduplicate_then_index",
+            "beliefs": [
+              {
+                "action": "create_unique_index",
+                "score": 0.3333333333333333,
+                "successes": 0,
+                "failures": 1,
+                "evidence": [
+                  "proof-93f8984454a7-cold:0"
+                ]
+              },
+              {
+                "action": "deduplicate_then_index",
+                "score": 0.6666666666666666,
+                "successes": 1,
+                "failures": 0,
+                "evidence": [
+                  "proof-93f8984454a7-cold:1"
+                ]
+              }
+            ],
+            "evidence": [
+              "proof-93f8984454a7-cold:1"
+            ],
+            "reason": "Highest success score in this exact context; ties favor no row deletion."
+          }
+        }
+      ],
+      "trace": [
+        {
+          "role": "retriever",
+          "evidence_count": 0,
+          "context": "{\"environment\": \"sandbox\", \"service\": \"customer-registry-324b7e65\", \"workload\": \"invoice-preserving-identity-migration\"}"
+        },
+        {
+          "role": "planner",
+          "action": "create_unique_index",
+          "evidence": []
+        },
+        {
+          "role": "executor",
+          "tool": "create_unique_index",
+          "outcome": {
+            "success": false,
+            "rows_before": 6,
+            "rows_after": 6,
+            "rows_removed": 0,
+            "index_created": false,
+            "invoice_count_before": 12,
+            "invoice_count_after": 12,
+            "invoice_total_cents_before": 10128,
+            "invoice_total_cents_after": 10128,
+            "invoice_references_relinked": 0,
+            "invariants": {
+              "failed_transaction_rolled_back": true,
+              "all_invoices_preserved": true,
+              "invoice_value_preserved": true
+            },
+            "detail": "UNIQUE constraint failed: customers.email"
+          }
+        },
+        {
+          "role": "memory",
+          "observation": "proof-93f8984454a7-cold:0",
+          "relation": "CONTRADICTS"
+        },
+        {
+          "role": "planner",
+          "action": "deduplicate_then_index",
+          "evidence": []
+        },
+        {
+          "role": "executor",
+          "tool": "deduplicate_then_index",
+          "outcome": {
+            "success": true,
+            "rows_before": 6,
+            "rows_after": 4,
+            "rows_removed": 2,
+            "index_created": true,
+            "invoice_count_before": 12,
+            "invoice_count_after": 12,
+            "invoice_total_cents_before": 10128,
+            "invoice_total_cents_after": 10128,
+            "invoice_references_relinked": 4,
+            "merge_audit_value_cents": 3839,
+            "invariants": {
+              "unique_identity": true,
+              "all_invoices_preserved": true,
+              "invoice_value_preserved": true,
+              "no_orphaned_invoice_references": true
+            },
+            "detail": "Identity merge and unique index verified; invoice references and totals preserved."
+          }
+        },
+        {
+          "role": "memory",
+          "observation": "proof-93f8984454a7-cold:1",
+          "relation": "SUPPORTS"
+        }
+      ],
+      "final": {
+        "action": "deduplicate_then_index",
+        "beliefs": [
+          {
+            "action": "create_unique_index",
+            "score": 0.3333333333333333,
+            "successes": 0,
+            "failures": 1,
+            "evidence": [
+              "proof-93f8984454a7-cold:0"
+            ]
+          },
+          {
+            "action": "deduplicate_then_index",
+            "score": 0.6666666666666666,
+            "successes": 1,
+            "failures": 0,
+            "evidence": [
+              "proof-93f8984454a7-cold:1"
+            ]
+          }
+        ],
+        "evidence": [
+          "proof-93f8984454a7-cold:1"
+        ],
+        "reason": "Highest success score in this exact context; ties favor no row deletion."
+      },
+      "success": true,
+      "execution_mode": "real SQLite tools on disposable synthetic data",
+      "memory_enabled": true,
+      "schema_version": "customers-v1",
+      "merge_authorized": true,
+      "rejected_memories": [],
+      "review_required": false,
+      "why_changed": [
+        {
+          "trigger": "proof-93f8984454a7-cold:0",
+          "from": "create_unique_index",
+          "to": "request_review"
+        }
+      ]
+    },
+    "learned_run": {
+      "id": "proof-93f8984454a7-warm",
+      "fingerprint": "2945826ad19e014dacf15988afbd6442061dded648728b88c187b768f5552ed3",
+      "context": "{\"environment\": \"sandbox\", \"service\": \"customer-registry-324b7e65\", \"workload\": \"invoice-preserving-identity-migration\"}",
+      "created_at": "2026-10-17T09:52:01.296149+00:00",
+      "goal": "Create a unique customer email index in a disposable database",
+      "initial": {
+        "action": "deduplicate_then_index",
+        "beliefs": [
+          {
+            "action": "create_unique_index",
+            "score": 0.3333333333333333,
+            "successes": 0,
+            "failures": 1,
+            "evidence": [
+              "proof-93f8984454a7-cold:0"
+            ]
+          },
+          {
+            "action": "deduplicate_then_index",
+            "score": 0.6666666666666666,
+            "successes": 1,
+            "failures": 0,
+            "evidence": [
+              "proof-93f8984454a7-cold:1"
+            ]
+          }
+        ],
+        "evidence": [
+          "proof-93f8984454a7-cold:1"
+        ],
+        "reason": "Highest success score in this exact context; ties favor no row deletion."
+      },
+      "events": [
+        {
+          "id": "proof-93f8984454a7-warm:0",
+          "action": "deduplicate_then_index",
+          "outcome": {
+            "success": true,
+            "rows_before": 22,
+            "rows_after": 18,
+            "rows_removed": 4,
+            "index_created": true,
+            "invoice_count_before": 44,
+            "invoice_count_after": 44,
+            "invoice_total_cents_before": 71302,
+            "invoice_total_cents_after": 71302,
+            "invoice_references_relinked": 8,
+            "merge_audit_value_cents": 19966,
+            "invariants": {
+              "unique_identity": true,
+              "all_invoices_preserved": true,
+              "invoice_value_preserved": true,
+              "no_orphaned_invoice_references": true
+            },
+            "detail": "Identity merge and unique index verified; invoice references and totals preserved."
+          },
+          "verified_procedure_id": "989c04455eecf6a93ac85d74e3cc750080307b601ff9273944c23ad8f632a8ca",
+          "before": {
+            "action": "deduplicate_then_index",
+            "beliefs": [
+              {
+                "action": "create_unique_index",
+                "score": 0.3333333333333333,
+                "successes": 0,
+                "failures": 1,
+                "evidence": [
+                  "proof-93f8984454a7-cold:0"
+                ]
+              },
+              {
+                "action": "deduplicate_then_index",
+                "score": 0.6666666666666666,
+                "successes": 1,
+                "failures": 0,
+                "evidence": [
+                  "proof-93f8984454a7-cold:1"
+                ]
+              }
+            ],
+            "evidence": [
+              "proof-93f8984454a7-cold:1"
+            ],
+            "reason": "Highest success score in this exact context; ties favor no row deletion."
+          },
+          "after": {
+            "action": "deduplicate_then_index",
+            "beliefs": [
+              {
+                "action": "create_unique_index",
+                "score": 0.3333333333333333,
+                "successes": 0,
+                "failures": 1,
+                "evidence": [
+                  "proof-93f8984454a7-cold:0"
+                ]
+              },
+              {
+                "action": "deduplicate_then_index",
+                "score": 0.75,
+                "successes": 2,
+                "failures": 0,
+                "evidence": [
+                  "proof-93f8984454a7-cold:1",
+                  "proof-93f8984454a7-warm:0"
+                ]
+              }
+            ],
+            "evidence": [
+              "proof-93f8984454a7-cold:1",
+              "proof-93f8984454a7-warm:0"
+            ],
+            "reason": "Highest success score in this exact context; ties favor no row deletion."
+          }
+        }
+      ],
+      "trace": [
+        {
+          "role": "retriever",
+          "evidence_count": 2,
+          "context": "{\"environment\": \"sandbox\", \"service\": \"customer-registry-324b7e65\", \"workload\": \"invoice-preserving-identity-migration\"}"
+        },
+        {
+          "role": "planner",
+          "action": "deduplicate_then_index",
+          "evidence": [
+            "proof-93f8984454a7-cold:1"
+          ]
+        },
+        {
+          "role": "executor",
+          "tool": "deduplicate_then_index",
+          "outcome": {
+            "success": true,
+            "rows_before": 22,
+            "rows_after": 18,
+            "rows_removed": 4,
+            "index_created": true,
+            "invoice_count_before": 44,
+            "invoice_count_after": 44,
+            "invoice_total_cents_before": 71302,
+            "invoice_total_cents_after": 71302,
+            "invoice_references_relinked": 8,
+            "merge_audit_value_cents": 19966,
+            "invariants": {
+              "unique_identity": true,
+              "all_invoices_preserved": true,
+              "invoice_value_preserved": true,
+              "no_orphaned_invoice_references": true
+            },
+            "detail": "Identity merge and unique index verified; invoice references and totals preserved."
+          }
+        },
+        {
+          "role": "memory",
+          "observation": "proof-93f8984454a7-warm:0",
+          "relation": "SUPPORTS"
+        }
+      ],
+      "final": {
+        "action": "deduplicate_then_index",
+        "beliefs": [
+          {
+            "action": "create_unique_index",
+            "score": 0.3333333333333333,
+            "successes": 0,
+            "failures": 1,
+            "evidence": [
+              "proof-93f8984454a7-cold:0"
+            ]
+          },
+          {
+            "action": "deduplicate_then_index",
+            "score": 0.75,
+            "successes": 2,
+            "failures": 0,
+            "evidence": [
+              "proof-93f8984454a7-cold:1",
+              "proof-93f8984454a7-warm:0"
+            ]
+          }
+        ],
+        "evidence": [
+          "proof-93f8984454a7-cold:1",
+          "proof-93f8984454a7-warm:0"
+        ],
+        "reason": "Highest success score in this exact context; ties favor no row deletion."
+      },
+      "success": true,
+      "execution_mode": "real SQLite tools on disposable synthetic data",
+      "memory_enabled": true,
+      "schema_version": "customers-v1",
+      "merge_authorized": true,
+      "rejected_memories": [],
+      "review_required": false,
+      "why_changed": []
+    },
+    "no_memory_agent_baseline": {
+      "id": "proof-93f8984454a7-no-memory",
+      "fingerprint": "33d9292e9bf88a57764acf1f30de0ad9e4678db05acba58b28d09ec8f0230f5a",
+      "context": "{\"environment\": \"sandbox\", \"service\": \"customer-registry-324b7e65\", \"workload\": \"invoice-preserving-identity-migration\"}",
+      "created_at": "2026-10-17T09:52:01.299221+00:00",
+      "goal": "Create a unique customer email index in a disposable database",
+      "initial": {
+        "action": "create_unique_index",
+        "beliefs": [
+          {
+            "action": "create_unique_index",
+            "score": 0.5,
+            "successes": 0,
+            "failures": 0,
+            "evidence": []
+          },
+          {
+            "action": "deduplicate_then_index",
+            "score": 0.5,
+            "successes": 0,
+            "failures": 0,
+            "evidence": []
+          }
+        ],
+        "evidence": [],
+        "reason": "Highest success score in this exact context; ties favor no row deletion."
+      },
+      "events": [
+        {
+          "id": "proof-93f8984454a7-no-memory:0",
+          "action": "create_unique_index",
+          "outcome": {
+            "success": false,
+            "rows_before": 22,
+            "rows_after": 22,
+            "rows_removed": 0,
+            "index_created": false,
+            "invoice_count_before": 44,
+            "invoice_count_after": 44,
+            "invoice_total_cents_before": 71302,
+            "invoice_total_cents_after": 71302,
+            "invoice_references_relinked": 0,
+            "invariants": {
+              "failed_transaction_rolled_back": true,
+              "all_invoices_preserved": true,
+              "invoice_value_preserved": true
+            },
+            "detail": "UNIQUE constraint failed: customers.email"
+          },
+          "before": {
+            "action": "create_unique_index",
+            "beliefs": [
+              {
+                "action": "create_unique_index",
+                "score": 0.5,
+                "successes": 0,
+                "failures": 0,
+                "evidence": []
+              },
+              {
+                "action": "deduplicate_then_index",
+                "score": 0.5,
+                "successes": 0,
+                "failures": 0,
+                "evidence": []
+              }
+            ],
+            "evidence": [],
+            "reason": "Highest success score in this exact context; ties favor no row deletion."
+          },
+          "after": {
+            "action": "request_review",
+            "beliefs": [
+              {
+                "action": "create_unique_index",
+                "score": 0.3333333333333333,
+                "successes": 0,
+                "failures": 1,
+                "evidence": [
+                  "proof-93f8984454a7-no-memory:0"
+                ]
+              },
+              {
+                "action": "deduplicate_then_index",
+                "score": 0.5,
+                "successes": 0,
+                "failures": 0,
+                "evidence": []
+              }
+            ],
+            "evidence": [
+              "proof-93f8984454a7-no-memory:0"
+            ],
+            "reason": "Known direct failure without an applicable, authorized procedure path; request review."
+          }
+        },
+        {
+          "id": "proof-93f8984454a7-no-memory:1",
+          "action": "deduplicate_then_index",
+          "outcome": {
+            "success": true,
+            "rows_before": 22,
+            "rows_after": 18,
+            "rows_removed": 4,
+            "index_created": true,
+            "invoice_count_before": 44,
+            "invoice_count_after": 44,
+            "invoice_total_cents_before": 71302,
+            "invoice_total_cents_after": 71302,
+            "invoice_references_relinked": 8,
+            "merge_audit_value_cents": 19966,
+            "invariants": {
+              "unique_identity": true,
+              "all_invoices_preserved": true,
+              "invoice_value_preserved": true,
+              "no_orphaned_invoice_references": true
+            },
+            "detail": "Identity merge and unique index verified; invoice references and totals preserved."
+          },
+          "verified_procedure_id": "989c04455eecf6a93ac85d74e3cc750080307b601ff9273944c23ad8f632a8ca",
+          "before": {
+            "action": "deduplicate_then_index",
+            "beliefs": [
+              {
+                "action": "create_unique_index",
+                "score": 0.3333333333333333,
+                "successes": 0,
+                "failures": 1,
+                "evidence": [
+                  "proof-93f8984454a7-no-memory:0"
+                ]
+              },
+              {
+                "action": "deduplicate_then_index",
+                "score": 0.5,
+                "successes": 0,
+                "failures": 0,
+                "evidence": []
+              }
+            ],
+            "evidence": [],
+            "reason": "Current tool failure overrides historical preference; never repeat a failed tool on unchanged input."
+          },
+          "after": {
+            "action": "deduplicate_then_index",
+            "beliefs": [
+              {
+                "action": "create_unique_index",
+                "score": 0.3333333333333333,
+                "successes": 0,
+                "failures": 1,
+                "evidence": [
+                  "proof-93f8984454a7-no-memory:0"
+                ]
+              },
+              {
+                "action": "deduplicate_then_index",
+                "score": 0.6666666666666666,
+                "successes": 1,
+                "failures": 0,
+                "evidence": [
+                  "proof-93f8984454a7-no-memory:1"
+                ]
+              }
+            ],
+            "evidence": [
+              "proof-93f8984454a7-no-memory:1"
+            ],
+            "reason": "Highest success score in this exact context; ties favor no row deletion."
+          }
+        }
+      ],
+      "trace": [
+        {
+          "role": "retriever",
+          "evidence_count": 0,
+          "context": "{\"environment\": \"sandbox\", \"service\": \"customer-registry-324b7e65\", \"workload\": \"invoice-preserving-identity-migration\"}"
+        },
+        {
+          "role": "planner",
+          "action": "create_unique_index",
+          "evidence": []
+        },
+        {
+          "role": "executor",
+          "tool": "create_unique_index",
+          "outcome": {
+            "success": false,
+            "rows_before": 22,
+            "rows_after": 22,
+            "rows_removed": 0,
+            "index_created": false,
+            "invoice_count_before": 44,
+            "invoice_count_after": 44,
+            "invoice_total_cents_before": 71302,
+            "invoice_total_cents_after": 71302,
+            "invoice_references_relinked": 0,
+            "invariants": {
+              "failed_transaction_rolled_back": true,
+              "all_invoices_preserved": true,
+              "invoice_value_preserved": true
+            },
+            "detail": "UNIQUE constraint failed: customers.email"
+          }
+        },
+        {
+          "role": "memory",
+          "observation": "proof-93f8984454a7-no-memory:0",
+          "relation": "CONTRADICTS"
+        },
+        {
+          "role": "planner",
+          "action": "deduplicate_then_index",
+          "evidence": []
+        },
+        {
+          "role": "executor",
+          "tool": "deduplicate_then_index",
+          "outcome": {
+            "success": true,
+            "rows_before": 22,
+            "rows_after": 18,
+            "rows_removed": 4,
+            "index_created": true,
+            "invoice_count_before": 44,
+            "invoice_count_after": 44,
+            "invoice_total_cents_before": 71302,
+            "invoice_total_cents_after": 71302,
+            "invoice_references_relinked": 8,
+            "merge_audit_value_cents": 19966,
+            "invariants": {
+              "unique_identity": true,
+              "all_invoices_preserved": true,
+              "invoice_value_preserved": true,
+              "no_orphaned_invoice_references": true
+            },
+            "detail": "Identity merge and unique index verified; invoice references and totals preserved."
+          }
+        },
+        {
+          "role": "memory",
+          "observation": "proof-93f8984454a7-no-memory:1",
+          "relation": "SUPPORTS"
+        }
+      ],
+      "final": {
+        "action": "deduplicate_then_index",
+        "beliefs": [
+          {
+            "action": "create_unique_index",
+            "score": 0.3333333333333333,
+            "successes": 0,
+            "failures": 1,
+            "evidence": [
+              "proof-93f8984454a7-no-memory:0"
+            ]
+          },
+          {
+            "action": "deduplicate_then_index",
+            "score": 0.6666666666666666,
+            "successes": 1,
+            "failures": 0,
+            "evidence": [
+              "proof-93f8984454a7-no-memory:1"
+            ]
+          }
+        ],
+        "evidence": [
+          "proof-93f8984454a7-no-memory:1"
+        ],
+        "reason": "Highest success score in this exact context; ties favor no row deletion."
+      },
+      "success": true,
+      "execution_mode": "real SQLite tools on disposable synthetic data",
+      "memory_enabled": false,
+      "schema_version": "customers-v1",
+      "merge_authorized": true,
+      "rejected_memories": [],
+      "review_required": false,
+      "why_changed": [
+        {
+          "trigger": "proof-93f8984454a7-no-memory:0",
+          "from": "create_unique_index",
+          "to": "request_review"
+        }
+      ]
+    },
+    "single_shot_direct_baseline": {
+      "success": false,
+      "rows_before": 22,
+      "rows_after": 22,
+      "rows_removed": 0,
+      "index_created": false,
+      "invoice_count_before": 44,
+      "invoice_count_after": 44,
+      "invoice_total_cents_before": 71302,
+      "invoice_total_cents_after": 71302,
+      "invoice_references_relinked": 0,
+      "invariants": {
+        "failed_transaction_rolled_back": true,
+        "all_invoices_preserved": true,
+        "invoice_value_preserved": true
+      },
+      "detail": "UNIQUE constraint failed: customers.email"
+    },
+    "proof": {
+      "passed": true,
+      "cold_first_action": "create_unique_index",
+      "cold_recovery_action": "deduplicate_then_index",
+      "learned_first_action": "deduplicate_then_index",
+      "prior_observations_retrieved": 2,
+      "cold_customer_rows": 6,
+      "learned_customer_rows": 22,
+      "learned_invoice_records_preserved": true,
+      "learned_invoice_value_preserved": true,
+      "no_memory_baseline_succeeded": true,
+      "same_final_outcome": true,
+      "failed_attempts_avoided": 1,
+      "learned_attempts": 1,
+      "no_memory_attempts": 2,
+      "single_shot_direct_baseline_failed": true
+    },
+    "limitations": "Synthetic customer and invoice data in disposable SQLite databases. This proves this bounded migration policy changed after recorded evidence; it is not a claim of general intelligence or production safety."
+  },
+  "ablation": {
+    "experiment_id": "ablation-82d7236b51ad",
+    "cases": [
+      {
+        "id": "duplicates-small",
+        "without_memory": {
+          "first_action": "create_unique_index",
+          "success": true,
+          "attempts": 2,
+          "failed_tool_attempts": 1,
+          "retrieved_observations": 0,
+          "rows_removed": 1,
+          "no_memory_baseline_success": false
+        },
+        "with_memory": {
+          "first_action": "deduplicate_then_index",
+          "success": true,
+          "attempts": 1,
+          "failed_tool_attempts": 0,
+          "retrieved_observations": 2,
+          "rows_removed": 1,
+          "no_memory_baseline_success": false
+        },
+        "action_changed": true,
+        "outcome_changed": false
+      },
+      {
+        "id": "duplicates-large",
+        "without_memory": {
+          "first_action": "create_unique_index",
+          "success": true,
+          "attempts": 2,
+          "failed_tool_attempts": 1,
+          "retrieved_observations": 0,
+          "rows_removed": 3,
+          "no_memory_baseline_success": false
+        },
+        "with_memory": {
+          "first_action": "deduplicate_then_index",
+          "success": true,
+          "attempts": 1,
+          "failed_tool_attempts": 0,
+          "retrieved_observations": 2,
+          "rows_removed": 3,
+          "no_memory_baseline_success": false
+        },
+        "action_changed": true,
+        "outcome_changed": false
+      },
+      {
+        "id": "clean-small",
+        "without_memory": {
+          "first_action": "create_unique_index",
+          "success": true,
+          "attempts": 1,
+          "failed_tool_attempts": 0,
+          "retrieved_observations": 0,
+          "rows_removed": 0,
+          "no_memory_baseline_success": true
+        },
+        "with_memory": {
+          "first_action": "deduplicate_then_index",
+          "success": true,
+          "attempts": 1,
+          "failed_tool_attempts": 0,
+          "retrieved_observations": 2,
+          "rows_removed": 0,
+          "no_memory_baseline_success": true
+        },
+        "action_changed": true,
+        "outcome_changed": false
+      }
+    ],
+    "count": 3,
+    "memory_changed_action_cases": 3,
+    "memory_changed_outcome_cases": 0,
+    "failed_tool_attempts_avoided": 2,
+    "method": "Paired deterministic synthetic SQLite workloads. Each condition uses a fresh context; the memory condition first records a cold failure and guarded recovery, then retrieves those observations for the same held-out case. Both conditions include the same direct-index baseline on identical values. Results apply only to these fixtures."
+  },
+  "release_memory_ablation": {
+    "service": "retry-ablation-57e90cc815",
+    "version": "same-fault-v1",
+    "memory": {
+      "decision": "blocked_from_memory",
+      "candidate_samples": 0,
+      "routed_status": 200
+    },
+    "no_persistent_memory": {
+      "decision": "introduced",
+      "candidate_probes": 1,
+      "candidate_status": 503,
+      "routed_status": 503
+    },
+    "memory_prevented_repeated_503": true,
+    "scope": "controlled local fault; stateless control is restarted without graph history"
+  },
+  "adversarial_evaluation": {
+    "version": "adverse-v1",
+    "fixture_sha256": "d68104b55dd944b83b344e61fdf3957eea6afc7af6b7716c0ac2473c62ab2d35",
+    "experiment_id": "adverse-b4de959770",
+    "count": 6,
+    "cases": [
+      {
+        "id": "duplicates-small",
+        "schema_version": "customers-v1",
+        "merge_authorized": true,
+        "no_memory_recovery": {
+          "first_action": "create_unique_index",
+          "success": true,
+          "review_required": false,
+          "attempts": 2,
+          "failed_tool_attempts": 1,
+          "retrieved_observations": 0,
+          "rejected_memories": [
+            {
+              "run_id": "ablation-15f0a395db-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-588e4470a5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-c0c90f7d22-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-0f8a296d08-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a3cd861ee5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a3cd861ee5-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a77b74659e-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-817276f57d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-817276f57d-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-f85f3eb166-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-55059072aa-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-55059072aa-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-db08918feb-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "proof-93f8984454a7-no-memory",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "proof-93f8984454a7-warm",
+              "reason": "context_mismatch"
+            }
+          ],
+          "evidence_ids": []
+        },
+        "memory": {
+          "first_action": "deduplicate_then_index",
+          "success": true,
+          "review_required": false,
+          "attempts": 1,
+          "failed_tool_attempts": 0,
+          "retrieved_observations": 2,
+          "rejected_memories": [
+            {
+              "run_id": "adverse-b4de959770-0-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-588e4470a5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-c0c90f7d22-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-0f8a296d08-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a3cd861ee5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a3cd861ee5-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a77b74659e-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-817276f57d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-817276f57d-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-f85f3eb166-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-55059072aa-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-55059072aa-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-db08918feb-eval-duplicates-small",
+              "reason": "context_mismatch"
+            }
+          ],
+          "evidence_ids": [
+            "adverse-b4de959770-0-1-train:1"
+          ]
+        },
+        "fixed_guarded": {
+          "success": true,
+          "review_required": false
+        },
+        "static_precondition_aware": {
+          "first_action": "deduplicate_then_index",
+          "success": true,
+          "review_required": false
+        }
+      },
+      {
+        "id": "duplicates-large",
+        "schema_version": "customers-v1",
+        "merge_authorized": true,
+        "no_memory_recovery": {
+          "first_action": "create_unique_index",
+          "success": true,
+          "review_required": false,
+          "attempts": 2,
+          "failed_tool_attempts": 1,
+          "retrieved_observations": 0,
+          "rejected_memories": [
+            {
+              "run_id": "adverse-b4de959770-0-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-588e4470a5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-c0c90f7d22-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-0f8a296d08-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a3cd861ee5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a3cd861ee5-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a77b74659e-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-817276f57d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-817276f57d-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-f85f3eb166-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-55059072aa-eval-duplicates-small",
+              "reason": "context_mismatch"
+            }
+          ],
+          "evidence_ids": []
+        },
+        "memory": {
+          "first_action": "deduplicate_then_index",
+          "success": true,
+          "review_required": false,
+          "attempts": 1,
+          "failed_tool_attempts": 0,
+          "retrieved_observations": 2,
+          "rejected_memories": [
+            {
+              "run_id": "adverse-b4de959770-1-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-588e4470a5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-c0c90f7d22-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-0f8a296d08-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a3cd861ee5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a3cd861ee5-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a77b74659e-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-817276f57d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-817276f57d-train",
+              "reason": "context_mismatch"
+            }
+          ],
+          "evidence_ids": [
+            "adverse-b4de959770-1-1-train:1"
+          ]
+        },
+        "fixed_guarded": {
+          "success": true,
+          "review_required": false
+        },
+        "static_precondition_aware": {
+          "first_action": "deduplicate_then_index",
+          "success": true,
+          "review_required": false
+        }
+      },
+      {
+        "id": "clean",
+        "schema_version": "customers-v1",
+        "merge_authorized": true,
+        "no_memory_recovery": {
+          "first_action": "create_unique_index",
+          "success": true,
+          "review_required": false,
+          "attempts": 1,
+          "failed_tool_attempts": 0,
+          "retrieved_observations": 0,
+          "rejected_memories": [
+            {
+              "run_id": "adverse-b4de959770-1-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-588e4470a5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-c0c90f7d22-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-0f8a296d08-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a3cd861ee5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a3cd861ee5-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a77b74659e-eval-clean-small",
+              "reason": "context_mismatch"
+            }
+          ],
+          "evidence_ids": []
+        },
+        "memory": {
+          "first_action": "deduplicate_then_index",
+          "success": true,
+          "review_required": false,
+          "attempts": 1,
+          "failed_tool_attempts": 0,
+          "retrieved_observations": 2,
+          "rejected_memories": [
+            {
+              "run_id": "adverse-b4de959770-2-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-588e4470a5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-c0c90f7d22-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-0f8a296d08-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-a3cd861ee5-eval-clean-small",
+              "reason": "context_mismatch"
+            }
+          ],
+          "evidence_ids": [
+            "adverse-b4de959770-2-1-train:1"
+          ]
+        },
+        "fixed_guarded": {
+          "success": true,
+          "review_required": false
+        },
+        "static_precondition_aware": {
+          "first_action": "create_unique_index",
+          "success": true,
+          "review_required": false
+        }
+      },
+      {
+        "id": "approval-required",
+        "schema_version": "customers-v1",
+        "merge_authorized": false,
+        "no_memory_recovery": {
+          "first_action": "create_unique_index",
+          "success": false,
+          "review_required": true,
+          "attempts": 2,
+          "failed_tool_attempts": 1,
+          "retrieved_observations": 0,
+          "rejected_memories": [
+            {
+              "run_id": "adverse-b4de959770-2-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-588e4470a5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-c0c90f7d22-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-eval-duplicates-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-5d87ee91a4-train",
+              "reason": "context_mismatch"
+            }
+          ],
+          "evidence_ids": []
+        },
+        "memory": {
+          "first_action": "request_review",
+          "success": false,
+          "review_required": true,
+          "attempts": 1,
+          "failed_tool_attempts": 0,
+          "retrieved_observations": 1,
+          "rejected_memories": [
+            {
+              "run_id": "adverse-b4de959770-3-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-588e4470a5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-c0c90f7d22-eval-duplicates-large",
+              "reason": "context_mismatch"
+            },
+            {
+              "observation_id": "adverse-b4de959770-3-1-train:1",
+              "reason": "merge_not_authorized"
+            }
+          ],
+          "evidence_ids": [
+            "adverse-b4de959770-3-1-train:0"
+          ]
+        },
+        "fixed_guarded": {
+          "success": false,
+          "review_required": true
+        },
+        "static_precondition_aware": {
+          "first_action": "request_review",
+          "success": false,
+          "review_required": true
+        }
+      },
+      {
+        "id": "schema-changed",
+        "schema_version": "customers-v2",
+        "merge_authorized": true,
+        "no_memory_recovery": {
+          "first_action": "create_unique_index",
+          "success": true,
+          "review_required": false,
+          "attempts": 2,
+          "failed_tool_attempts": 1,
+          "retrieved_observations": 0,
+          "rejected_memories": [
+            {
+              "run_id": "adverse-b4de959770-3-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-588e4470a5-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-b4dca3065d-eval-duplicates-large",
+              "reason": "context_mismatch"
+            }
+          ],
+          "evidence_ids": []
+        },
+        "memory": {
+          "first_action": "create_unique_index",
+          "success": true,
+          "review_required": false,
+          "attempts": 2,
+          "failed_tool_attempts": 1,
+          "retrieved_observations": 0,
+          "rejected_memories": [
+            {
+              "run_id": "adverse-b4de959770-4-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-4-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-eval-clean-small",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "ablation-15f0a395db-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "observation_id": "adverse-b4de959770-4-1-train:0",
+              "reason": "schema_version_mismatch"
+            },
+            {
+              "observation_id": "adverse-b4de959770-4-1-train:1",
+              "reason": "schema_version_mismatch"
+            }
+          ],
+          "evidence_ids": []
+        },
+        "fixed_guarded": {
+          "success": true,
+          "review_required": false
+        },
+        "static_precondition_aware": {
+          "first_action": "deduplicate_then_index",
+          "success": true,
+          "review_required": false
+        }
+      },
+      {
+        "id": "unrelated-service",
+        "schema_version": "customers-v1",
+        "merge_authorized": true,
+        "no_memory_recovery": {
+          "first_action": "create_unique_index",
+          "success": true,
+          "review_required": false,
+          "attempts": 2,
+          "failed_tool_attempts": 1,
+          "retrieved_observations": 0,
+          "rejected_memories": [
+            {
+              "run_id": "adverse-b4de959770-5-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-4-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-4-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-4-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-4-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-0",
+              "reason": "context_mismatch"
+            }
+          ],
+          "evidence_ids": []
+        },
+        "memory": {
+          "first_action": "create_unique_index",
+          "success": true,
+          "review_required": false,
+          "attempts": 2,
+          "failed_tool_attempts": 1,
+          "retrieved_observations": 0,
+          "rejected_memories": [
+            {
+              "run_id": "adverse-b4de959770-5-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-5-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-5-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-4-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-4-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-4-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-4-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-3-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-2-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-1-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-1-0-train",
+              "reason": "context_mismatch"
+            },
+            {
+              "run_id": "adverse-b4de959770-0-1",
+              "reason": "context_mismatch"
+            }
+          ],
+          "evidence_ids": []
+        },
+        "fixed_guarded": {
+          "success": true,
+          "review_required": false
+        },
+        "static_precondition_aware": {
+          "first_action": "deduplicate_then_index",
+          "success": true,
+          "review_required": false
+        }
+      }
+    ],
+    "method": "Fixed synthetic cases, identical evaluation inputs and recovery budget, one identical prior training task per isolated condition scope; retrieval is disabled for the control. Includes changed schema, unrelated service, and denied merge authorization. Static precondition-aware and fixed guarded baselines are reported, not omitted.",
+    "conclusion": "Memory can avoid an initial failed attempt on a repeated applicable task. This suite does not establish superiority over a competent static precondition-aware policy. Generalization beyond the fixed action space is not established."
+  },
+  "graph_edge_ablation": {
+    "before": "deduplicate_then_index",
+    "after": "request_review",
+    "rejected": [
+      {
+        "run_id": "adverse-b4de959770-5-1",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-5-1-train",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-5-0",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-5-0-train",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-4-1",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-4-1-train",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-4-0",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-4-0-train",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-3-1",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-3-1-train",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-3-0",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-3-0-train",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-2-1",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-2-1-train",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-2-0",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-2-0-train",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-1-1",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-1-1-train",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-1-0",
+        "reason": "context_mismatch"
+      },
+      {
+        "run_id": "adverse-b4de959770-1-0-train",
+        "reason": "context_mismatch"
+      },
+      {
+        "observation_id": "edge-training:1",
+        "reason": "missing_active_procedure_path"
+      },
+      {
+        "observation_id": "edge-before:0",
+        "reason": "missing_active_procedure_path"
+      }
+    ]
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "type": "ReleaseIncident"
+      },
+      {
+        "id": "245bee70-b2c8-4b0b-aeb3-eb450a9f99a9",
+        "type": "ReleaseIncident"
+      },
+      {
+        "id": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+        "type": "AgentHandoff"
+      },
+      {
+        "id": "14254dbd-fa86-40c2-8f16-721f39d6f2d5",
+        "type": "AgentHandoff"
+      },
+      {
+        "id": "22b667bd-526f-4fc4-b195-183c33b101bc",
+        "type": "AgentHandoff"
+      },
+      {
+        "id": "c23f46c9-d529-4ac6-83d3-12ba973cf3fd",
+        "type": "EvidenceReview"
+      },
+      {
+        "id": "96522045-d242-44d6-99b0-39d625d2cee7",
+        "type": "CoordinationDecision"
+      },
+      {
+        "id": "30aa79b9-13d0-4903-a806-338ad81fe5e7",
+        "type": "ReleaseIncident"
+      },
+      {
+        "id": "99115a87-0770-4909-a087-6ff73fca5a05",
+        "type": "ReleaseIncident"
+      },
+      {
+        "id": "9aae6776-7dbb-47a6-97f5-407c7dccbb79",
+        "type": "ReleaseIncident"
+      },
+      {
+        "id": "ab6852be-a00a-4dc9-887e-97ca06fbf90f",
+        "type": "ReleaseIncident"
+      },
+      {
+        "id": "204bdb82-d5bc-4cc6-85b3-7a266c94ca61",
+        "type": "AgentHandoff"
+      },
+      {
+        "id": "90b5c964-3732-4ea4-8045-9a3689402403",
+        "type": "EvidenceReview"
+      },
+      {
+        "id": "87723512-4da0-4250-aab2-102a130115d6",
+        "type": "CoordinationDecision"
+      },
+      {
+        "id": "d5296a15-8c20-4433-b4bd-0ecd53cfd472",
+        "type": "EvidenceReview"
+      },
+      {
+        "id": "1f3e5ce4-79ee-4e27-a9d6-ba67a70075a5",
+        "type": "CoordinationDecision"
+      },
+      {
+        "id": "49a719c2-d1d6-4dad-a674-f2f78452fe49",
+        "type": "EvidenceReview"
+      },
+      {
+        "id": "9ebd59ed-1593-43ae-8606-553aa47377c6",
+        "type": "CoordinationDecision"
+      },
+      {
+        "id": "5de08d5d-5f28-4ea2-a0cf-1902aecd41ba",
+        "type": "ReleaseIncident"
+      },
+      {
+        "id": "ecb64ed1-d07c-4aa9-9ef2-32381c59f52a",
+        "type": "ReleaseIncident"
+      },
+      {
+        "id": "7557c4b0-967a-445d-a9e3-236418236b96",
+        "type": "AgentHandoff"
+      },
+      {
+        "id": "9087cad0-82fc-4c43-8441-f5c887087f1b",
+        "type": "EvidenceReview"
+      },
+      {
+        "id": "ed8a7a60-402d-48bc-b1ab-22763c60ab1a",
+        "type": "CoordinationDecision"
+      },
+      {
+        "id": "1d99f440-4230-4ab1-8032-83800e9359b3",
+        "type": "ReleaseIncident"
+      },
+      {
+        "id": "0836c283-507b-449f-a14c-4a4d0f1bcc86",
+        "type": "ReleaseIncident"
+      },
+      {
+        "id": "f725b3b2-3e6b-459c-a811-97bfbd04240f",
+        "type": "ReleaseIncident"
+      },
+      {
+        "id": "715e5f6d-7c90-47f7-83cb-2d06f2995110",
+        "type": "AgentHandoff"
+      },
+      {
+        "id": "5ce93047-58a1-4120-90df-eea0e0217369",
+        "type": "EvidenceReview"
+      },
+      {
+        "id": "1ff779c9-ff72-48b2-92c6-78557b031b1c",
+        "type": "CoordinationDecision"
+      },
+      {
+        "id": "c2cd7963-dfd9-44ed-af5c-5ca91956008a",
+        "type": "ReleaseIncident"
+      },
+      {
+        "id": "42359358-dd78-4e83-8a9e-2f85b82998cf",
+        "type": "ReleaseIncident"
+      }
+    ],
+    "edges": [
+      {
+        "source": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "target": "245bee70-b2c8-4b0b-aeb3-eb450a9f99a9",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "target": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+        "relation": "HANDED_OFF"
+      },
+      {
+        "source": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "target": "14254dbd-fa86-40c2-8f16-721f39d6f2d5",
+        "relation": "HANDED_OFF"
+      },
+      {
+        "source": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "target": "22b667bd-526f-4fc4-b195-183c33b101bc",
+        "relation": "HANDED_OFF"
+      },
+      {
+        "source": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+        "target": "c23f46c9-d529-4ac6-83d3-12ba973cf3fd",
+        "relation": "REVIEWED_BY"
+      },
+      {
+        "source": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+        "target": "96522045-d242-44d6-99b0-39d625d2cee7",
+        "relation": "HANDED_OFF_TO"
+      },
+      {
+        "source": "30aa79b9-13d0-4903-a806-338ad81fe5e7",
+        "target": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "c23f46c9-d529-4ac6-83d3-12ba973cf3fd",
+        "target": "96522045-d242-44d6-99b0-39d625d2cee7",
+        "relation": "FORWARDED_TO"
+      },
+      {
+        "source": "96522045-d242-44d6-99b0-39d625d2cee7",
+        "target": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "96522045-d242-44d6-99b0-39d625d2cee7",
+        "target": "30aa79b9-13d0-4903-a806-338ad81fe5e7",
+        "relation": "EXECUTED"
+      },
+      {
+        "source": "99115a87-0770-4909-a087-6ff73fca5a05",
+        "target": "9aae6776-7dbb-47a6-97f5-407c7dccbb79",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "ab6852be-a00a-4dc9-887e-97ca06fbf90f",
+        "target": "30aa79b9-13d0-4903-a806-338ad81fe5e7",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "ab6852be-a00a-4dc9-887e-97ca06fbf90f",
+        "target": "204bdb82-d5bc-4cc6-85b3-7a266c94ca61",
+        "relation": "HANDED_OFF"
+      },
+      {
+        "source": "204bdb82-d5bc-4cc6-85b3-7a266c94ca61",
+        "target": "90b5c964-3732-4ea4-8045-9a3689402403",
+        "relation": "REVIEWED_BY"
+      },
+      {
+        "source": "204bdb82-d5bc-4cc6-85b3-7a266c94ca61",
+        "target": "87723512-4da0-4250-aab2-102a130115d6",
+        "relation": "HANDED_OFF_TO"
+      },
+      {
+        "source": "90b5c964-3732-4ea4-8045-9a3689402403",
+        "target": "87723512-4da0-4250-aab2-102a130115d6",
+        "relation": "FORWARDED_TO"
+      },
+      {
+        "source": "87723512-4da0-4250-aab2-102a130115d6",
+        "target": "d84a6bf7-c952-4d2a-bad7-7fdd8c858f74",
+        "relation": "RETRIEVED"
+      },
+      {
+        "source": "87723512-4da0-4250-aab2-102a130115d6",
+        "target": "ab6852be-a00a-4dc9-887e-97ca06fbf90f",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "14254dbd-fa86-40c2-8f16-721f39d6f2d5",
+        "target": "d5296a15-8c20-4433-b4bd-0ecd53cfd472",
+        "relation": "REVIEWED_BY"
+      },
+      {
+        "source": "14254dbd-fa86-40c2-8f16-721f39d6f2d5",
+        "target": "1f3e5ce4-79ee-4e27-a9d6-ba67a70075a5",
+        "relation": "HANDED_OFF_TO"
+      },
+      {
+        "source": "d5296a15-8c20-4433-b4bd-0ecd53cfd472",
+        "target": "1f3e5ce4-79ee-4e27-a9d6-ba67a70075a5",
+        "relation": "FORWARDED_TO"
+      },
+      {
+        "source": "1f3e5ce4-79ee-4e27-a9d6-ba67a70075a5",
+        "target": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "1f3e5ce4-79ee-4e27-a9d6-ba67a70075a5",
+        "target": "204bdb82-d5bc-4cc6-85b3-7a266c94ca61",
+        "relation": "RETRIEVED"
+      },
+      {
+        "source": "22b667bd-526f-4fc4-b195-183c33b101bc",
+        "target": "49a719c2-d1d6-4dad-a674-f2f78452fe49",
+        "relation": "REVIEWED_BY"
+      },
+      {
+        "source": "22b667bd-526f-4fc4-b195-183c33b101bc",
+        "target": "9ebd59ed-1593-43ae-8606-553aa47377c6",
+        "relation": "HANDED_OFF_TO"
+      },
+      {
+        "source": "49a719c2-d1d6-4dad-a674-f2f78452fe49",
+        "target": "9ebd59ed-1593-43ae-8606-553aa47377c6",
+        "relation": "FORWARDED_TO"
+      },
+      {
+        "source": "9ebd59ed-1593-43ae-8606-553aa47377c6",
+        "target": "8eebd3ae-ef94-4d46-878f-4775653c21c6",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "9ebd59ed-1593-43ae-8606-553aa47377c6",
+        "target": "14254dbd-fa86-40c2-8f16-721f39d6f2d5",
+        "relation": "RETRIEVED"
+      },
+      {
+        "source": "5de08d5d-5f28-4ea2-a0cf-1902aecd41ba",
+        "target": "ecb64ed1-d07c-4aa9-9ef2-32381c59f52a",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "5de08d5d-5f28-4ea2-a0cf-1902aecd41ba",
+        "target": "7557c4b0-967a-445d-a9e3-236418236b96",
+        "relation": "HANDED_OFF"
+      },
+      {
+        "source": "7557c4b0-967a-445d-a9e3-236418236b96",
+        "target": "9087cad0-82fc-4c43-8441-f5c887087f1b",
+        "relation": "REVIEWED_BY"
+      },
+      {
+        "source": "7557c4b0-967a-445d-a9e3-236418236b96",
+        "target": "ed8a7a60-402d-48bc-b1ab-22763c60ab1a",
+        "relation": "HANDED_OFF_TO"
+      },
+      {
+        "source": "1d99f440-4230-4ab1-8032-83800e9359b3",
+        "target": "5de08d5d-5f28-4ea2-a0cf-1902aecd41ba",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "9087cad0-82fc-4c43-8441-f5c887087f1b",
+        "target": "ed8a7a60-402d-48bc-b1ab-22763c60ab1a",
+        "relation": "FORWARDED_TO"
+      },
+      {
+        "source": "ed8a7a60-402d-48bc-b1ab-22763c60ab1a",
+        "target": "5de08d5d-5f28-4ea2-a0cf-1902aecd41ba",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "ed8a7a60-402d-48bc-b1ab-22763c60ab1a",
+        "target": "1d99f440-4230-4ab1-8032-83800e9359b3",
+        "relation": "EXECUTED"
+      },
+      {
+        "source": "0836c283-507b-449f-a14c-4a4d0f1bcc86",
+        "target": "f725b3b2-3e6b-459c-a811-97bfbd04240f",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "0836c283-507b-449f-a14c-4a4d0f1bcc86",
+        "target": "715e5f6d-7c90-47f7-83cb-2d06f2995110",
+        "relation": "HANDED_OFF"
+      },
+      {
+        "source": "715e5f6d-7c90-47f7-83cb-2d06f2995110",
+        "target": "5ce93047-58a1-4120-90df-eea0e0217369",
+        "relation": "REVIEWED_BY"
+      },
+      {
+        "source": "715e5f6d-7c90-47f7-83cb-2d06f2995110",
+        "target": "1ff779c9-ff72-48b2-92c6-78557b031b1c",
+        "relation": "HANDED_OFF_TO"
+      },
+      {
+        "source": "c2cd7963-dfd9-44ed-af5c-5ca91956008a",
+        "target": "0836c283-507b-449f-a14c-4a4d0f1bcc86",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "5ce93047-58a1-4120-90df-eea0e0217369",
+        "target": "1ff779c9-ff72-48b2-92c6-78557b031b1c",
+        "relation": "FORWARDED_TO"
+      },
+      {
+        "source": "1ff779c9-ff72-48b2-92c6-78557b031b1c",
+        "target": "0836c283-507b-449f-a14c-4a4d0f1bcc86",
+        "relation": "BASED_ON"
+      },
+      {
+        "source": "1ff779c9-ff72-48b2-92c6-78557b031b1c",
+        "target": "c2cd7963-dfd9-44ed-af5c-5ca91956008a",
+        "relation": "EXECUTED"
+      },
+      {
+        "source": "42359358-dd78-4e83-8a9e-2f85b82998cf",
+        "target": "c2cd7963-dfd9-44ed-af5c-5ca91956008a",
+        "relation": "BASED_ON"
+      }
+    ]
+  }
+}

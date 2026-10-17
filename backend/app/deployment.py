@@ -68,6 +68,16 @@ def run_canary(scenario):
             "execution_mode": "real HTTP probe against disposable localhost target; synthetic latency/error fixtures"}
 
 
+def promote_or_rollback(service, decision):
+    """Describe a simulated release decision; no routing or deployment operation executes."""
+    if not service or decision not in {"promote", "rollback"}:
+        raise ValueError("A valid service and promote/rollback decision are required")
+    return {"service": service, "action": decision, "executed": False, "simulated": True,
+            "execution_mode": "bounded demo action; no production system or cloud account is connected",
+            "detail": (f"{service} marked ready for staged promotion" if decision == "promote"
+                       else f"{service} release held and rollback recorded")}
+
+
 def evaluate_deployments():
     expected = {"healthy": "promote", "readiness_failure": "rollback",
                 "canary_regression": "rollback", "slow_release": "rollback"}

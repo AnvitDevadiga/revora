@@ -19,6 +19,7 @@ class ScriptedTransport:
             ("inspect_deployment", {"scenario": "canary_regression"}),
             ("run_canary", {"scenario": "canary_regression"}),
             ("record_outcome", {"service": "payments", "scenario": "canary_regression", "decision": "rollback", "success": False, "reason": "Latency and error gates failed"}),
+            ("promote_or_rollback", {"service": "payments", "decision": "rollback"}),
         ]
         if self.step < len(script):
             name, args = script[self.step]; self.step += 1
@@ -29,7 +30,7 @@ class ScriptedTransport:
 def test_llm_agent_runs_required_memory_and_deployment_tools():
     agent = GroqAgent(transport=ScriptedTransport())
     result = agent.run("Deploy safely", "payments", "canary_regression")
-    assert [step["tool"] for step in result["trace"]] == ["search_memory", "inspect_deployment", "run_canary", "record_outcome"]
+    assert [step["tool"] for step in result["trace"]] == ["search_memory", "inspect_deployment", "run_canary", "record_outcome", "promote_or_rollback"]
     assert result["canary"]["decision"] == "rollback"
     assert result["answer"].startswith("Rollback")
 
@@ -62,3 +63,47 @@ def test_model_cannot_skip_memory_or_change_authorized_context():
             return {"role": "assistant", "tool_calls": [{"id": "bad", "type": "function", "function": {"name": "search_memory", "arguments": '{"service":"other","scenario":"healthy"}'}}]}
     with pytest.raises(RuntimeError, match="authorized service"):
         GroqAgent(transport=WrongService()).run("Deploy", "payments", "healthy")
+
+    class ParallelCalls:
+        def complete(self, *_):
+            call = {"id": "parallel", "type": "function", "function": {
+                "name": "search_memory", "arguments": '{"service":"payments","scenario":"healthy"}'}}
+            return {"role": "assistant", "tool_calls": [call, {**call, "id": "parallel-2"}]}
+    with pytest.raises(RuntimeError, match="exactly one tool"):
+        GroqAgent(transport=ParallelCalls()).run("Deploy", "payments", "healthy")
+
+
+def test_agent_capacity_fails_fast_when_stateful_run_is_active():
+    from threading import Event, Thread
+    import pytest
+    from app.groq_agent import AgentCapacityError
+
+    entered = Event()
+    release = Event()
+    errors = []
+
+    class BlockingTransport:
+        def complete(self, *_):
+            entered.set()
+            release.wait(timeout=2)
+            return {"role": "assistant", "content": "incomplete"}
+
+    agent = GroqAgent(transport=BlockingTransport())
+    worker = Thread(target=lambda: _capture_agent_error(agent, errors))
+    worker.start()
+    assert entered.wait(timeout=1)
+    try:
+        with pytest.raises(AgentCapacityError):
+            agent.run("Deploy", "payments", "healthy")
+    finally:
+        release.set()
+        worker.join(timeout=2)
+    assert not worker.is_alive()
+    assert len(errors) == 1 and isinstance(errors[0], RuntimeError)
+
+
+def _capture_agent_error(agent, errors):
+    try:
+        agent.run("Deploy", "payments", "healthy")
+    except RuntimeError as error:
+        errors.append(error)

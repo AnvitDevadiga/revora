@@ -1,6 +1,6 @@
 services:
   falkordb:
-    image: falkordb/falkordb:latest
+    image: falkordb/falkordb@sha256:e2765e207e5ba4ee90e47ed31eb7491ad6dd3d42241c326e429375c02ad9882f
     ports: ["127.0.0.1:6379:6379"]
     volumes:
       - revora-data:/var/lib/falkordb/data
@@ -20,6 +20,10 @@ services:
       PORT: "8000"
       GROQ_API_KEY: "${GROQ_API_KEY:-}"
       GROQ_MODEL: "${GROQ_MODEL:-openai/gpt-oss-20b}"
+      REVORA_API_KEY: "${REVORA_API_KEY:-}"
+      REVORA_SERVICE_NAME: "${REVORA_SERVICE_NAME:-revora-demo}"
+      REVORA_STABLE_URL: "${REVORA_STABLE_URL:-}"
+      REVORA_CANDIDATE_URL: "${REVORA_CANDIDATE_URL:-}"
     ports: ["127.0.0.1:8000:8000"]
     depends_on:
       falkordb:

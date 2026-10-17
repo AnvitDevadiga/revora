@@ -11,3 +11,8 @@
 .groq-final-backup*/
 docs/artifacts/*.webm
 !docs/artifacts/demo-walkthrough.webm
+**/.env.*
+!**/.env.example
+**/.vercel/
+output/
+docs/Revora_Project_History_and_Vision.pdf

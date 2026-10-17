@@ -1,0 +1,82 @@
+/* ============================================================
+   runtime — the migration attempt ledger
+   ============================================================ */
+
+.run-stats {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  color: var(--text-1);
+  margin: 6px 0 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.run-choice {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 8px 0;
+}
+
+.run-choice small {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: var(--text-2);
+  min-width: 150px;
+  text-transform: lowercase;
+}
+
+.run-choice b {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 560;
+  color: var(--mint);
+}
+
+.change-line {
+  position: relative;
+  margin: 7px 0;
+  padding-left: 18px;
+  color: var(--text-1);
+  font-size: 13px;
+}
+
+.change-line::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  font-family: var(--font-mono);
+  color: var(--mint-dim);
+}
+
+/* ---------- evidence svg ---------- */
+
+.evidence-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 14px;
+  padding: 12px 0;
+  border: 1px solid var(--line-0);
+  border-radius: var(--r-md);
+  background: rgba(0, 0, 0, 0.24);
+}
+
+.evidence-svg text { font-family: var(--font-mono); }
+
+.obs-row {
+  animation: fadeIn 0.5s var(--ease-out) both;
+  animation-delay: calc(var(--r) * 90ms);
+}
+
+.obs-hit { cursor: pointer; }
+
+.obs-hit circle {
+  transition: stroke var(--dur-2) var(--ease-out), filter var(--dur-2) var(--ease-out);
+}
+
+.obs-hit:hover circle { filter: drop-shadow(0 0 9px rgba(84, 224, 179, 0.4)); }
+
+.obs-hit:focus { outline: none; }
+.obs-hit:focus-visible circle { stroke: var(--mint); }
