@@ -4,7 +4,7 @@
   "scope": "anvitdevadiga",
   "plan": "Hobby",
   "production_url": "https://revora-graph-memory.vercel.app",
-  "deployment_id": "dpl_AKhRPjZXAHkRxVyYpFKYazz2qdM3",
+  "deployment_id": "dpl_3EnvZ5fFjHTAYaqh73bAGd1xsds8",
   "mode": "verified production replay; live execution requires a separately hosted backend",
   "verified_paths": [
     "/",
@@ -14,8 +14,8 @@
     "/demo.vtt"
   ],
   "verified_http_status": 200,
-  "production_deployment_url": "https://revora-graph-memory-eyvjtknrz-anvitdevadiga.vercel.app",
+  "production_deployment_url": "https://revora-graph-memory-extoy6cah-anvitdevadiga.vercel.app",
   "verified_evidence": ["persisted EvidenceReview graph node", "review refusal paths", "restart memory retry ablation"],
   "walkthrough": "Two captioned captured checkpoints; explicitly not a continuous screen recording.",
-  "verified_at": "2026-10-17T11:42:00+00:00"
+  "verified_at": "2026-10-17T11:47:00+00:00"
 }

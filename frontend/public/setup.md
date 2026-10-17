@@ -1,4 +1,4 @@
-# Revora — reproduce the evidence
+# revora — reproduce the evidence
 
 The public Vercel site replays a captured, verified local acceptance run. A live backend is not hosted by that deployment.
 
