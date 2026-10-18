@@ -162,3 +162,10 @@ def test_agent_stream_reports_capacity_as_retryable_sse_event(monkeypatch):
     assert response.status_code == 200
     assert '"status": 429' in response.text
     assert '"retry_after": 1' in response.text
+
+
+def test_root_describes_the_api():
+    from fastapi.testclient import TestClient
+    from app.main import app
+    body = TestClient(app).get("/").json()
+    assert body["service"] == "revora-api" and body["endpoints"]["health"] == "/health"

@@ -447,6 +447,16 @@ def scenarios():
 def replay(payload: ReplayIn):
     return laboratory.run(payload.scenario, payload.replay_id)
 
+@app.get("/")
+def root():
+    """Landing response so the bare API URL explains itself instead of returning 404."""
+    return {"service": "revora-api", "status": "running",
+            "description": "Agent memory and coordination on FalkorDB (Graph Hacks, Track 2).",
+            "dashboard": "https://revora-anvitdevadiga.vercel.app",
+            "endpoints": {"health": "/health", "live_gateway": "/api/release/live",
+                          "coordination_graph": "/api/coordination/graph",
+                          "incident_history": "/api/release/history", "api_docs": "/docs"}}
+
 @app.get("/health")
 def health():
     try:
