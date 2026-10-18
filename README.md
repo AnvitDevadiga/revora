@@ -85,18 +85,18 @@ Open http://localhost:3000 → **Live workspace** → **Connect** (`http://local
 
 ```mermaid
 graph LR
-  C1[Component<br/>payments-sdk@2.1]
+  C1["Component<br/>payments-sdk@2.1"]
   I3["ReleaseIncident<br/>v8 · blocked"] -- USES --> C1
   I2["ReleaseIncident<br/>v7 · blocked"] -- BASED_ON --> I1
   I3 -- BASED_ON --> I1["ReleaseIncident<br/>v7 · rollback<br/>error_rate · p95_latency_ms"]
   I1 -- USES --> C1
-  I1 -- HANDED_OFF --> H[AgentHandoff]
-  H -- REVIEWED_BY --> R[EvidenceReview]
+  I1 -- HANDED_OFF --> H["AgentHandoff"]
+  H -- REVIEWED_BY --> R["EvidenceReview"]
   R -- FORWARDED_TO --> D["CoordinationDecision<br/>proposed_action · guardrail"]
   H -- HANDED_OFF_TO --> D
   D -- BASED_ON --> I1
   D -- EXECUTED --> I1
-  D -. RETRIEVED .-> H0[prior AgentHandoff]
+  D -. RETRIEVED .-> H0["prior AgentHandoff"]
 ```
 
 ## Key Cypher (from `backend/app`)
