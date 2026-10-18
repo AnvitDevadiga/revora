@@ -2,7 +2,7 @@
 
 **ai remembers. revora learns.** · Graph Hacks — **Track 2: Agent Memory and Coordination** · powered by FalkorDB
 
-Demo video: [`docs/artifacts/revora-demo.mp4`](docs/artifacts/revora-demo.mp4) · Public replay: [revora-anvitdevadiga.vercel.app](https://revora-anvitdevadiga.vercel.app) · Full technical reference: [docs/TECHNICAL.md](docs/TECHNICAL.md)
+▶ **[Watch the demo video](https://youtu.be/ezqdiSkRHpM)** · Live app: [revora-anvitdevadiga.vercel.app](https://revora-anvitdevadiga.vercel.app) · Full technical reference: [docs/TECHNICAL.md](docs/TECHNICAL.md)
 
 **The problem.** Agents that run infrastructure forget. A release agent that rolled back `v7` at 2am will ship `v7` again at 3am, and it will happily ship `v8` too, even though `v8` carries the same broken SDK. Meanwhile the agent that planned the fix has no durable way to see what the measuring agent observed.
 
@@ -12,6 +12,8 @@ Demo video: [`docs/artifacts/revora-demo.mp4`](docs/artifacts/revora-demo.mp4) �
 - **Shares a component that only ever appeared in failed releases?** → blocked, via `(new)-[:USES]->(component)<-[:USES]-(failed release)`.
 
 Zero requests reach the bad candidate. Remove the graph and the same retry serves HTTP 503.
+
+[![Revora demo video](https://img.youtube.com/vi/ezqdiSkRHpM/maxresdefault.jpg)](https://youtu.be/ezqdiSkRHpM)
 
 ![Live agent coordination graph read from FalkorDB](docs/artifacts/coordination-graph.png)
 
