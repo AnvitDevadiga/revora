@@ -286,6 +286,65 @@ class ReleaseController:
                        and item["decision"] in {"rollback", "promote"}), None)
         return {"id": latest["id"], "timestamp": latest["timestamp"]} if latest and latest["failed"] else None
 
+    @staticmethod
+    def _components(components):
+        """Validate the dependency/config identifiers a candidate version ships with."""
+        items = sorted({str(item).strip() for item in (components or []) if str(item).strip()})
+        if len(items) > 8 or any(not re.fullmatch(r"[a-zA-Z0-9._@:/-]{1,80}", item) for item in items):
+            raise ValueError("Provide up to 8 components such as payments-sdk@2.1 or config@a41")
+        return items
+
+    def _suspect_components(self, service, version, components):
+        """Multi-hop memory: find components this candidate shares with a failed release.
+
+        A component is implicated only if it shipped in a measured rollback of a
+        different version and never in a promoted release, so shared healthy
+        baseline dependencies do not block unrelated candidates.
+        """
+        if not components:
+            return []
+        if self.graph is not None:
+            rows = self.graph.query(
+                "MATCH (c:Component) WHERE c.key IN $components "
+                "MATCH (c)<-[:USES]-(bad:ReleaseIncident {service:$service, decision:'rollback', failed:true}) "
+                "WHERE bad.version <> $version "
+                "AND NOT (c)<-[:USES]-(:ReleaseIncident {service:$service, decision:'promote'}) "
+                "RETURN c.key, bad.id, bad.version, bad.timestamp ORDER BY bad.timestamp DESC",
+                {"components": components, "service": service, "version": version}).result_set
+            matches = [{"component": r[0], "incident_id": r[1], "version": r[2], "timestamp": r[3]} for r in rows]
+        else:
+            healthy = {c for i in self.local_incidents if i["service"] == service and i.get("decision") == "promote"
+                       for c in i.get("components", [])}
+            matches = [{"component": c, "incident_id": i["id"], "version": i["version"], "timestamp": i["timestamp"]}
+                       for i in reversed(self.local_incidents)
+                       if i["service"] == service and i.get("decision") == "rollback" and i.get("failed")
+                       and i["version"] != version
+                       for c in i.get("components", []) if c in components and c not in healthy]
+        seen, unique = set(), []
+        for match in matches:
+            if match["component"] not in seen:
+                seen.add(match["component"])
+                unique.append(match)
+        return unique
+
+    def _memory_block(self, incident, components, force_recheck=False):
+        """Return the graph evidence that blocks this candidate, or None."""
+        prior = incident["prior_evidence"]
+        if prior:
+            incident["memory_match"] = "exact_version"
+            return "FalkorDB contains a measured failure for this exact version; it was not activated."
+        suspects = [] if force_recheck else self._suspect_components(incident["service"], incident["version"], components)
+        if not suspects:
+            return None
+        first = suspects[0]
+        incident["memory_match"] = "shared_component"
+        incident["implicated_components"] = suspects
+        incident["prior_evidence"] = {"id": first["incident_id"], "timestamp": first["timestamp"],
+                                      "version": first["version"], "component": first["component"]}
+        names = ", ".join(item["component"] for item in suspects)
+        return (f"Shares {names} with failed release {first['version']}; that component has never shipped "
+                "in a healthy release, so the candidate was not activated.")
+
     def _record(self, incident):
         incident.setdefault("onset_id", (incident.get("prior_evidence") or {}).get("id", ""))
         if self.graph is not None:
@@ -297,7 +356,8 @@ class ReleaseController:
                 "i.payload=$payload "
                 "WITH i OPTIONAL MATCH (prior:ReleaseIncident {id:$prior_id}) "
                 "FOREACH (_ IN CASE WHEN prior IS NULL THEN [] ELSE [1] END | "
-                "MERGE (i)-[:BASED_ON]->(prior))",
+                "MERGE (i)-[:BASED_ON]->(prior)) "
+                "FOREACH (key IN $components | MERGE (c:Component {key:key}) MERGE (i)-[:USES]->(c))",
                 {"id": incident["id"], "service": incident["service"],
                  "version": incident["version"], "failed": incident["failed"],
                  "decision": incident["decision"], "timestamp": incident["timestamp"],
@@ -307,7 +367,8 @@ class ReleaseController:
                  "sample_count": (incident.get("metrics") or {}).get("sample_count"),
                  "error_rate": (incident.get("metrics") or {}).get("error_rate"),
                  "p95_latency_ms": (incident.get("metrics") or {}).get("p95_latency_ms"),
-                 "prior_id": (incident.get("prior_evidence") or {}).get("id", "")})
+                 "prior_id": (incident.get("prior_evidence") or {}).get("id", ""),
+                 "components": incident.get("components", [])})
         else:
             self.local_incidents.append(incident)
         logger.info("incident_recorded service=%s incident=%s onset=%s handoff=%s decision=%s",
@@ -323,7 +384,7 @@ class ReleaseController:
             return [json.loads(row[0]) for row in rows]
         return list(reversed(list(self.local_incidents)[-limit:]))
 
-    def inject(self, version, mode):
+    def inject(self, version, mode, components=None):
         """Leave an intentional fault active so its HTTP failure is observable."""
         if self.external:
             raise ValueError("Fault injection is available only for the project-owned demo service")
@@ -333,16 +394,17 @@ class ReleaseController:
             with self.lock:
                 if self.pending is not None:
                     raise ValueError("Recover the current incident before introducing another")
+            components = self._components(components)
             prior = self._prior_failure(self.service, version)
             before = self._probe(self.gateway_url)
             incident = {"id": str(uuid4()), "service": self.service, "version": version,
                         "timestamp": datetime.now(timezone.utc).isoformat(),
-                        "measurement_mode": "live_gateway", "before": before,
+                        "measurement_mode": "live_gateway", "before": before, "components": components,
                         "prior_evidence": prior, "canary_samples": [], "recovery_samples": []}
-            if prior:
+            block_reason = self._memory_block(incident, components)
+            if block_reason:
                 incident.update({"decision": "blocked_from_memory", "failed": True,
-                                 "after": self._probe(self.gateway_url),
-                                 "reason": "FalkorDB contains a measured failure for this exact version; it was not activated."})
+                                 "after": self._probe(self.gateway_url), "reason": block_reason})
                 self._record(incident)
                 return incident
             with self.lock:
@@ -494,7 +556,7 @@ class ReleaseController:
                 self._persist_state()
             return result
 
-    def run(self, version, mode, force_recheck=False):
+    def run(self, version, mode, force_recheck=False, components=None):
         """Operate only the Revora-owned gateway and its two local targets."""
         if mode not in MODES or not version or len(version) > 64:
             raise ValueError("Invalid candidate version or mode")
@@ -502,13 +564,23 @@ class ReleaseController:
             if self.pending is not None:
                 raise ValueError("Recover the active incident before starting another release")
             service = self.service
+            components = self._components(components)
             prior = self._prior_failure(service, version)
             before = self._probe(self.gateway_url)
             incident = {"id": str(uuid4()), "service": service, "version": version,
                         "timestamp": datetime.now(timezone.utc).isoformat(),
-                        "measurement_mode": "candidate_preflight",
+                        "measurement_mode": "candidate_preflight", "components": components,
                         "before": before, "prior_evidence": prior,
                         "canary_samples": [], "recovery_samples": []}
+            block_reason = self._memory_block(incident, components, force_recheck)
+            if block_reason and not prior:
+                with self.lock:
+                    self.route = "stable"
+                incident.update({"decision": "blocked_from_memory", "failed": True,
+                                 "after": self._probe(self.gateway_url), "reason": block_reason})
+                self._record(incident)
+                self._persist_state()
+                return incident
             if prior:
                 # A memory override is never allowed to put a known failed version
                 # on the live route. Explicit rechecks stay behind stable preflight.
@@ -522,6 +594,7 @@ class ReleaseController:
                     self._persist_state()
                     return incident
                 incident["recheck_override"] = True
+                incident.pop("memory_match", None)
 
             # Every candidate is checked off-route. A passing result is the only
             # path that can change the caller-visible route to candidate.

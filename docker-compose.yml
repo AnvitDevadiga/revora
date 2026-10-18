@@ -20,6 +20,7 @@ services:
       PORT: "8000"
       GROQ_API_KEY: "${GROQ_API_KEY:-}"
       GROQ_MODEL: "${GROQ_MODEL:-openai/gpt-oss-20b}"
+      GROQ_PLANNER_MODEL: "${GROQ_PLANNER_MODEL:-}"
       REVORA_API_KEY: "${REVORA_API_KEY:-}"
       REVORA_SERVICE_NAME: "${REVORA_SERVICE_NAME:-revora-demo}"
       REVORA_STABLE_URL: "${REVORA_STABLE_URL:-}"

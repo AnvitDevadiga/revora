@@ -6,6 +6,8 @@ import "./release-ops.css";
 export default function ReleaseOps({ request, api }) {
   const [version, setVersion] = useState("");
   const [mode, setMode] = useState("errors");
+  const [componentText, setComponentText] = useState("base@1, payments-sdk@2.1");
+  const components = componentText.split(",").map(item => item.trim()).filter(Boolean);
   const [live, setLive] = useState(null);
   const [traffic, setTraffic] = useState(null);
   const [result, setResult] = useState(null);
@@ -40,7 +42,7 @@ export default function ReleaseOps({ request, api }) {
     try {
       const response = await request(`${api}/api/release/run`, {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ version, mode: live?.target_mode === "configured_services" ? "healthy" : mode, force_recheck: forceRecheck }), timeoutMs: 30000,
+        body: JSON.stringify({ version, mode: live?.target_mode === "configured_services" ? "healthy" : mode, force_recheck: forceRecheck, components }), timeoutMs: 30000,
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.detail || `run failed (${response.status})`);
@@ -149,17 +151,20 @@ export default function ReleaseOps({ request, api }) {
         <option value="errors">Every request fails · HTTP 503</option>
         <option value="mixed">Intermittent HTTP 503</option><option value="slow">High response latency</option>
       </select></label>}
+      <label>Ships with components<input value={componentText} onChange={event => setComponentText(event.target.value)} placeholder="payments-sdk@2.1, config@a41" spellCheck="false" disabled={busy} /></label>
       {live?.target_mode === "configured_services" && <button onClick={park} disabled={busy}>park on stable</button>}
       {live?.target_mode === "configured_services" ? <button className="primary" onClick={() => run()} disabled={busy || !/^[a-zA-Z0-9._-]+$/.test(version)}>{busy ? "measuring…" : "gate candidate release"}</button>
         : live?.incident_active ? <button className="restore-button" onClick={() => stage("/api/coordination/recover", {})} disabled={busy}>{busy ? "measuring and restoring…" : "2. investigate, hand off & restore"}</button>
-          : <button className="primary" onClick={() => stage("/api/release/inject", { version, mode })} disabled={busy || !/^[a-zA-Z0-9._-]+$/.test(version)}>{busy ? "introducing fault…" : "1. introduce failure"}</button>}
+          : <button className="primary" onClick={() => stage("/api/release/inject", { version, mode, components })} disabled={busy || !/^[a-zA-Z0-9._-]+$/.test(version)}>{busy ? "introducing fault…" : "1. introduce failure"}</button>}
     </div>
     {error && <p className="error" role="alert">{error}</p>}
 
     {blocked && result.prior_evidence && <div className="memory-banner" role="status">
       <span className="shield" aria-hidden="true">⛨</span>
-      <div><strong>Blocked before its first request — revora remembered.</strong>
-        <span>FalkorDB match: ReleaseIncident {result.prior_evidence.id.slice(0, 8)} · {result.version} · recorded {new Date(result.prior_evidence.timestamp).toLocaleTimeString()} · 0 candidate probes</span></div>
+      {result.memory_match === "shared_component" ? <div><strong>{result.version} blocked before its first request — it shares a failed component.</strong>
+        <span>FalkorDB path: ({result.version})-[:USES]→({result.implicated_components.map(item => item.component).join(", ")})←[:USES]-({result.prior_evidence.version}, rolled back) · 0 candidate probes</span></div>
+        : <div><strong>Blocked before its first request — revora remembered.</strong>
+          <span>FalkorDB match: ReleaseIncident {result.prior_evidence.id.slice(0, 8)} · {result.version} · recorded {new Date(result.prior_evidence.timestamp).toLocaleTimeString()} · 0 candidate probes</span></div>}
     </div>}
 
     {result && <div className="release-result" aria-live="polite">
@@ -173,14 +178,23 @@ export default function ReleaseOps({ request, api }) {
       <p className="muted">{result.prior_evidence ? `decision linked to prior incident ${result.prior_evidence.id.slice(0, 8)}.` : "first observation for this candidate version."} {result.recovery_samples.length ? `${result.recovery_samples.length} healthy gateway requests verified after rollback.` : ""}</p>
       <div className="handoff-action"><div><strong>evidence-reviewed graph handoff</strong><small>Release Analyst → Evidence Reviewer → Recovery Planner; recovery stays blocked unless measurements pass review.</small></div><button className="primary" onClick={handoff} disabled={busy || result.decision === "introduced"}>{busy ? "reviewing handoff…" : "run agent handoff"}</button></div>
       {coordination?.trace && <div className="handoff-lanes" aria-label="agent handoff timeline">{coordination.trace.map((step, index) => {
-        const status = step.output?.status || step.output?.action || step.step;
+        const planner = step.output?.planner;
+        const status = planner?.source === "llm" ? `${planner.proposed_action} · ${planner.guardrail}`
+          : step.agent === "release_analyst" ? `${step.output?.decision} · ${step.output?.sample_count ?? 0} samples${step.output?.memory_match ? ` · ${step.output.memory_match}` : ""}`
+            : step.output?.status || step.output?.action || step.step;
         return <div className="handoff-lane" key={step.agent + index} style={{ "--i": index }}>
-          <span className="who">{step.agent.replaceAll("_", " ")}</span>
+          <span className="who">{step.agent.replaceAll("_", " ")}{planner?.source === "llm" ? " · llm" : ""}</span>
           <span className={`chip ${step.output?.status || ""}`}>{step.step.replaceAll("_", " ")} → {String(status).replaceAll("_", " ")}</span>
         </div>;
       })}</div>}
+      {coordination?.plan?.planner?.source === "llm" && <div className={`planner-card ${coordination.plan.planner.guardrail}`}>
+        <div className="planner-head"><span className="section-kicker">ai recovery planner · {coordination.plan.planner.model}</span>
+          <span className="guardrail">guardrail {coordination.plan.planner.guardrail}</span></div>
+        <p>“{coordination.plan.planner.rationale}”</p>
+        <small>proposed <b>{coordination.plan.planner.proposed_action.replaceAll("_", " ")}</b>{coordination.plan.planner.cited?.length ? ` · cites ${coordination.plan.planner.cited.join(", ")}` : ""}{coordination.plan.planner.veto_reason ? ` · ${coordination.plan.planner.veto_reason}` : ""}</small>
+      </div>}
       {coordination && <div className="handoff-result" aria-live="polite"><strong>{coordination.plan.action.replaceAll("_", " ")}</strong><span>Release Analyst → Evidence Reviewer → Recovery Planner · based on incident {coordination.provenance.source_incident_id.slice(0, 8)}</span>{coordination.plan.evidence_review && <span>Evidence review: {coordination.plan.evidence_review.status.replaceAll("_", " ")}</span>}{coordination.plan.evidence_review?.requested_evidence.length > 0 && <span>Requested: {coordination.plan.evidence_review.requested_evidence.join("; ")}</span>}{coordination.plan.evidence_review?.contradictions.length > 0 && <span>Rejected: {coordination.plan.evidence_review.contradictions.join("; ")}</span>}<span>{coordination.plan.reason}</span>{coordination.execution && <span>Execution verified · {coordination.execution.recovery_samples.length} healthy recovery checks · outcome {coordination.execution.id.slice(0, 8)}</span>}<details><summary>inspect handoff evidence and graph record</summary><pre className="json-record">{JSON.stringify(coordination, null, 2)}</pre></details></div>}
-      {result.decision !== "introduced" && <div className="release-actions"><button onClick={() => live?.target_mode === "configured_services" ? run() : stage("/api/release/inject", { version, mode })} disabled={busy || live?.incident_active}>3. retry same version</button><button onClick={() => run(true)} disabled={busy || live?.incident_active}>force fresh check</button></div>}
+      {result.decision !== "introduced" && <div className="release-actions"><button onClick={() => live?.target_mode === "configured_services" ? run() : stage("/api/release/inject", { version, mode, components })} disabled={busy || live?.incident_active}>3. retry same version</button><button onClick={() => run(true)} disabled={busy || live?.incident_active}>force fresh check</button></div>}
       <details><summary>inspect request measurements and graph evidence</summary><pre className="json-record">{JSON.stringify(result, null, 2)}</pre></details>
     </div>}
 

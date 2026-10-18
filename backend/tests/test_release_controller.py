@@ -153,3 +153,39 @@ def test_malformed_persisted_diagnosis_returns_clean_conflict_without_clearing_i
         assert controller.recover()["recovered"] is True
     finally:
         controller.close()
+
+
+def test_shared_failed_component_blocks_new_version_but_healthy_baseline_does_not():
+    controller = ReleaseController()
+    try:
+        healthy = controller.run("v6", "healthy", components=["base@1"])
+        assert healthy["decision"] == "promote"
+        failed = controller.run("v7", "errors", components=["base@1", "payments-sdk@2.1"])
+        assert failed["decision"] == "rollback"
+
+        blocked = controller.run("v8", "healthy", components=["base@1", "payments-sdk@2.1"])
+        assert blocked["decision"] == "blocked_from_memory"
+        assert blocked["memory_match"] == "shared_component"
+        assert [item["component"] for item in blocked["implicated_components"]] == ["payments-sdk@2.1"]
+        assert blocked["prior_evidence"]["id"] == failed["id"]
+        assert blocked["canary_samples"] == []
+
+        clean = controller.run("v9", "healthy", components=["base@1", "payments-sdk@2.2"])
+        assert clean["decision"] == "promote"
+        rechecked = controller.run("v10", "healthy", force_recheck=True, components=["payments-sdk@2.1"])
+        assert rechecked["decision"] == "promote"
+    finally:
+        controller.close()
+
+
+def test_component_identifiers_are_validated():
+    controller = ReleaseController()
+    try:
+        for bad in (["a b"], [f"c{i}" for i in range(9)]):
+            try:
+                controller.run("v1", "healthy", components=bad)
+            except ValueError:
+                continue
+            raise AssertionError("invalid components must be rejected")
+    finally:
+        controller.close()

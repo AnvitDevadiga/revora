@@ -16,6 +16,7 @@ export default function Home() {
   apiKeyRef.current = apiKey;
   const [connection, setConnection] = useState("connect your local or hosted backend to run fresh experiments.");
   const [connected, setConnected] = useState(false);
+  const [database, setDatabase] = useState("");
   const [connecting, setConnecting] = useState(false);
   async function request(url, options = {}) {
     const { timeoutMs = 15000, ...fetchOptions } = options;
@@ -33,7 +34,7 @@ export default function Home() {
       const response = await request(`${base}/api/runtime/history`);
       if (response.status === 401) throw new Error("enter the workspace API key and connect.");
       if (!response.ok) throw new Error(`connection failed (${response.status}).`);
-      setApi(base); setConnected(true);
+      setApi(base); setConnected(true); setDatabase(status.database);
       setConnection(status.database === "falkordb" ? "connected · persistent FalkorDB memory · fresh executions enabled" : "connected · temporary memory · results will not survive a restart");
     } catch (error) { setConnection(error.message === "Failed to fetch" ? "cannot reach the backend. start the local stack or enter a reachable HTTPS backend URL." : error.message); }
     finally { setConnecting(false); }
@@ -46,7 +47,7 @@ export default function Home() {
         <button aria-pressed={view === "replay"} onClick={() => setView("replay")}>Verified replay</button>
         <button aria-pressed={view === "live"} onClick={() => setView("live")}>Live workspace</button>
       </div>
-      {connected && <span className="nav-live" role="img" aria-label="backend connected"><i aria-hidden="true" />live</span>}
+      {connected && <span className="nav-live" role="img" aria-label="backend connected"><i aria-hidden="true" />live{database === "falkordb" ? " · falkordb" : " · temporary memory"}</span>}
     </nav>
     {view === "replay" ? <EvidenceReplay onLive={() => setView("live")} /> : <>
       <section className="workspace-connection" aria-label="connect live workspace">

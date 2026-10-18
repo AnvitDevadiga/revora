@@ -2,17 +2,21 @@
 from __future__ import annotations
 
 import json
+import logging
 from datetime import datetime, timezone
 from threading import RLock
 from uuid import uuid4
 from .release_controller import measure_gates
+from .llm_planner import guard
 
 HANDOFF_AUTH_WINDOW_SECONDS = 300
+logger = logging.getLogger("revora.coordination")
 
 
 class CoordinationWorkflow:
-    def __init__(self, graph=None):
+    def __init__(self, graph=None, planner=None):
         self.graph = graph
+        self.planner = planner
         self.lock = RLock()
         self.records: dict[str, dict] = {}
 
@@ -35,7 +39,9 @@ class CoordinationWorkflow:
                     "canary_statuses": [sample.get("status") for sample in canary_samples],
                     "canary_latencies_ms": [sample.get("latency_ms") for sample in canary_samples],
                     "metrics": incident.get("metrics") or {},
-                    "measurement_mode": incident.get("measurement_mode", "unknown")}
+                    "measurement_mode": incident.get("measurement_mode", "unknown"),
+                    "components": incident.get("components", []),
+                    "memory_match": incident.get("memory_match")}
         handoff = {"id": str(uuid4()), "type": "AgentHandoff", "from_agent": "release_analyst",
                    "to_agent": "recovery_planner", "created_at": datetime.now(timezone.utc).isoformat(),
                    "evidence": evidence}
@@ -69,13 +75,17 @@ class CoordinationWorkflow:
                 age = (datetime.now(timezone.utc) - datetime.fromisoformat(handoff["created_at"])).total_seconds()
                 if age < 0 or age > HANDOFF_AUTH_WINDOW_SECONDS:
                     raise ValueError("Stale handoff: recovery authorization expired")
-                if review["status"] == "accepted":
-                    if evidence["decision"] != "diagnosed":
-                        review = {"status": "rejected", "requested_evidence": [],
-                                  "contradictions": ["Only a measured diagnosis can authorize the recovery tool."]}
-                    else:
-                        execution = executor.recover_handoff(evidence, handoff_id)
+                if review["status"] == "accepted" and evidence["decision"] != "diagnosed":
+                    review = {"status": "rejected", "requested_evidence": [],
+                              "contradictions": ["Only a measured diagnosis can authorize the recovery tool."]}
             failed = evidence["decision"] in {"rollback", "blocked_from_memory"} or evidence["failed"]
+            # The planner (LLM when configured) reasons over graph memory before any tool runs;
+            # the guardrail keeps the evidence-derived action authoritative.
+            context = self.planning_context(evidence) if use_memory else {}
+            planner = self._plan_with_model(evidence, review, context,
+                                            self._safe_action(review, evidence, failed, executor is not None))
+            if executor is not None and review["status"] == "accepted":
+                execution = executor.recover_handoff(evidence, handoff_id)
             if review["status"] == "needs_evidence":
                 action = "request_evidence"
                 reason = "Recovery is paused until the analyst supplies the requested measurements."
@@ -88,20 +98,23 @@ class CoordinationWorkflow:
                           if failed else "The recorded candidate passed its measured gate; continue bounded monitoring.")
             if prior and prior["action"] == "keep_stable_and_verify":
                 reason += " Prior graph handoff retained the stable route after failure."
+            if planner.get("guardrail") == "accepted" and planner.get("rationale"):
+                reason = f"{planner['rationale']} (guardrail verified against measured evidence)"
             review_id = str(uuid4())
             plan = {"id": str(uuid4()), "type": "CoordinationDecision", "agent": "recovery_planner",
                     "handoff_id": handoff_id, "action": action, "reason": reason,
                     "based_on": [evidence["incident_id"]],
                     "prior_handoff_id": prior["handoff_id"] if prior else None,
                     "memory_enabled": use_memory, "evidence_review_id": review_id,
-                    "evidence_review": review, "execution": execution,
+                    "evidence_review": review, "execution": execution, "planner": planner,
                     "execution_status": "verified" if execution and execution.get("recovered") else
                     "failed" if execution else "not_executed" if review["status"] != "accepted" else "planned"}
             result = {"handoff": handoff, "plan": plan, "trace": [
                 {"agent": "release_analyst", "step": "publish_measured_incident", "output": evidence},
                 {"agent": "evidence_reviewer", "step": "validate_measurements", "output": review},
-                {"agent": "recovery_planner", "step": "read_persisted_handoff", "input_handoff_id": handoff_id,
-                 "retrieved_prior_handoff": prior, "output": plan}],
+                {"agent": "recovery_planner", "step": "llm_proposal_guarded" if planner["source"] == "llm" else "read_persisted_handoff",
+                 "input_handoff_id": handoff_id, "retrieved_prior_handoff": prior,
+                 "graph_context": context, "output": plan}],
                 "provenance": {"source_incident_id": evidence["incident_id"],
                                "source": "persisted_graph_handoff" if self.graph is not None else "temporary_memory_handoff",
                                "measurement_mode": evidence["measurement_mode"]}}
@@ -112,7 +125,8 @@ class CoordinationWorkflow:
                     "MATCH (i:ReleaseIncident {id:$incident_id})-[:HANDED_OFF]->(h:AgentHandoff {id:$handoff_id}) "
                     "CREATE (r:EvidenceReview {id:$review_id,agent:'evidence_reviewer',status:$review_status,payload:$review_payload,created_at:$created_at}) "
                     "CREATE (h)-[:REVIEWED_BY]->(r) "
-                    "CREATE (d:CoordinationDecision {id:$id,agent:'recovery_planner',action:$action,reason:$reason,payload:$payload,review_status:$review_status,execution_status:$execution_status}) "
+                    "CREATE (d:CoordinationDecision {id:$id,agent:'recovery_planner',action:$action,reason:$reason,payload:$payload,review_status:$review_status,execution_status:$execution_status,"
+                    "planner_source:$planner_source,guardrail:$guardrail,proposed_action:$proposed_action}) "
                     "CREATE (r)-[:FORWARDED_TO]->(d) "
                     "CREATE (h)-[:HANDED_OFF_TO]->(d) CREATE (d)-[:BASED_ON]->(i) "
                     "WITH d OPTIONAL MATCH (prior:AgentHandoff {id:$prior_id}) "
@@ -126,12 +140,52 @@ class CoordinationWorkflow:
                      "created_at": datetime.now(timezone.utc).isoformat(),
                      "payload": json.dumps(plan), "prior_id": plan["prior_handoff_id"] or "",
                      "review_status": review["status"], "execution_status": plan["execution_status"],
-                     "outcome_id": execution["id"] if execution else ""}).result_set
+                     "outcome_id": execution["id"] if execution else "",
+                     "planner_source": planner["source"], "guardrail": planner["guardrail"],
+                     "proposed_action": planner.get("proposed_action") or ""}).result_set
                 if not rows:
                     raise ValueError("Handoff evidence path was not found in the graph")
             else:
                 self.records[handoff_id] = result
             return result
+
+    @staticmethod
+    def _safe_action(review: dict, evidence: dict, failed: bool, will_execute: bool) -> str:
+        """The action the measured, reviewed evidence requires, computed before any tool runs."""
+        if review["status"] == "needs_evidence":
+            return "request_evidence"
+        if review["status"] == "rejected":
+            return "reject_handoff"
+        if will_execute and evidence["decision"] == "diagnosed" and failed:
+            return "rollback_and_verify"
+        return "keep_stable_and_verify" if failed else "continue_candidate_monitoring"
+
+    def _plan_with_model(self, evidence, review, context, safe_action):
+        if self.planner is None:
+            return guard(None, safe_action)
+        try:
+            return guard(self.planner.propose(evidence, review, context), safe_action)
+        except (RuntimeError, ValueError, KeyError, TypeError) as error:
+            logger.warning("planner_fallback error=%s", str(error)[:200])
+            return guard(None, safe_action, error=str(error)[:200])
+
+    def planning_context(self, evidence: dict) -> dict:
+        """Graph memory handed to the planner: recent incidents, their components and links."""
+        if self.graph is None:
+            return {"recent_incidents": []}
+        rows = self.graph.query(
+            "MATCH (i:ReleaseIncident {service:$service}) "
+            "WHERE i.decision IN ['rollback','blocked_from_memory','promote'] "
+            "WITH i ORDER BY i.timestamp DESC LIMIT 6 "
+            "OPTIONAL MATCH (i)-[:USES]->(c:Component) "
+            "OPTIONAL MATCH (i)-[:BASED_ON]->(p:ReleaseIncident) "
+            "RETURN i.id,i.version,i.decision,i.error_rate,i.p95_latency_ms,i.timestamp,"
+            "collect(DISTINCT c.key),collect(DISTINCT p.id)",
+            {"service": evidence["service"]}).result_set
+        incidents = [{"id": r[0], "version": r[1], "decision": r[2], "error_rate": r[3],
+                      "p95_latency_ms": r[4], "timestamp": r[5], "components": r[6], "based_on": r[7]}
+                     for r in sorted(rows, key=lambda row: row[5] or "", reverse=True)]
+        return {"recent_incidents": incidents}
 
     @staticmethod
     def _review(evidence: dict) -> dict:
@@ -285,7 +339,7 @@ class CoordinationWorkflow:
                                          "agent": "recovery_planner", "status": plan.get("action")}
                     edges.append({"source": handoff["id"], "target": plan["id"], "relation": "HANDED_OFF_TO"})
             return {"nodes": list(nodes.values()), "edges": edges}
-        rels = "HANDED_OFF|REVIEWED_BY|FORWARDED_TO|HANDED_OFF_TO|BASED_ON|EXECUTED|RETRIEVED"
+        rels = "HANDED_OFF|REVIEWED_BY|FORWARDED_TO|HANDED_OFF_TO|BASED_ON|EXECUTED|RETRIEVED|USES"
         # Collect distinct reachable nodes (no path materialisation), then the edges among them.
         # Incidents with no edges yet still appear because they are collected on their own.
         rows = self.graph.query(
@@ -295,13 +349,17 @@ class CoordinationWorkflow:
             "WITH seeds + [n IN reached WHERE NOT n IN seeds] AS ns "
             f"UNWIND ns AS a OPTIONAL MATCH (a)-[r:{rels}]->(b) WHERE b IN ns "
             "WITH ns, collect(DISTINCT r) AS rs "
-            "RETURN [n IN ns | [n.id, labels(n)[0], n.version, coalesce(n.decision, n.status, n.action), "
-            "n.agent, coalesce(n.timestamp, n.created_at), n.error_rate, n.p95_latency_ms, n.sample_count]], "
-            "[r IN rs | [startNode(r).id, type(r), endNode(r).id]]",
+            "RETURN [n IN ns | [coalesce(n.id, 'component:' + n.key), labels(n)[0], coalesce(n.version, n.key), "
+            "coalesce(n.decision, n.status, n.action), "
+            "n.agent, coalesce(n.timestamp, n.created_at), n.error_rate, n.p95_latency_ms, n.sample_count, "
+            "n.planner_source, n.guardrail, n.proposed_action]], "
+            "[r IN rs | [coalesce(startNode(r).id, 'component:' + startNode(r).key), type(r), "
+            "coalesce(endNode(r).id, 'component:' + endNode(r).key)]]",
             {"service": service, "limit": limit}).result_set
         if not rows:
             return {"nodes": [], "edges": []}
-        keys = ("id", "type", "version", "status", "agent", "timestamp", "error_rate", "p95_latency_ms", "sample_count")
+        keys = ("id", "type", "version", "status", "agent", "timestamp", "error_rate", "p95_latency_ms", "sample_count",
+                "planner_source", "guardrail", "proposed_action")
         nodes = [dict(zip(keys, n)) for n in rows[0][0] or []]
         edges = [{"source": a, "relation": rel, "target": b} for a, rel, b in rows[0][1] or []]
         return {"nodes": nodes, "edges": edges}

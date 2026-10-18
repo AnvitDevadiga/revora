@@ -184,3 +184,48 @@ def test_graph_view_exposes_incident_handoff_and_decision():
     view = workflow.graph_view("checkout")
     assert {"ReleaseIncident", "AgentHandoff", "CoordinationDecision"} <= {n["type"] for n in view["nodes"]}
     assert {"HANDED_OFF", "HANDED_OFF_TO"} <= {e["relation"] for e in view["edges"]}
+
+
+class _FakeTransport:
+    def __init__(self, content):
+        self.content, self.calls = content, []
+
+    def complete(self, messages, tools):
+        self.calls.append(messages)
+        if isinstance(self.content, Exception):
+            raise self.content
+        return {"content": self.content}
+
+
+def _planner(content):
+    from app.llm_planner import LLMPlanner
+    return LLMPlanner(_FakeTransport(content), "test-model")
+
+
+FAILED = {"id": "incident-9", "service": "checkout", "version": "v9", "decision": "rollback",
+          "failed": True, "during": {"status": 503}, "after": {"status": 200}}
+
+
+def test_llm_planner_proposal_accepted_when_it_matches_evidence():
+    planner = _planner('{"action":"keep_stable_and_verify","rationale":"v9 failed; stay stable.","cited":["incident"]}')
+    result = CoordinationWorkflow(planner=planner).run(FAILED)
+    assert result["plan"]["planner"]["source"] == "llm"
+    assert result["plan"]["planner"]["guardrail"] == "accepted"
+    assert result["plan"]["action"] == "keep_stable_and_verify"
+    assert result["plan"]["reason"].startswith("v9 failed; stay stable.")
+    assert "graph_memory" in planner.transport.calls[0][1]["content"]
+
+
+def test_llm_planner_unsafe_proposal_is_vetoed():
+    planner = _planner('{"action":"continue_candidate_monitoring","rationale":"looks fine","cited":[]}')
+    result = CoordinationWorkflow(planner=planner).run(FAILED)
+    assert result["plan"]["planner"]["guardrail"] == "vetoed"
+    assert result["plan"]["action"] == "keep_stable_and_verify"
+    assert "looks fine" not in result["plan"]["reason"]
+
+
+def test_llm_planner_failure_falls_back_to_deterministic_plan():
+    for content in (RuntimeError("Groq API unavailable"), "not json", '{"action":"rm -rf"}'):
+        result = CoordinationWorkflow(planner=_planner(content)).run(FAILED)
+        assert result["plan"]["planner"]["guardrail"] == "planner_error"
+        assert result["plan"]["action"] == "keep_stable_and_verify"

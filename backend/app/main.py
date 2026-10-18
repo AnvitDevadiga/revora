@@ -27,6 +27,7 @@ from .deployment import evaluate_deployments
 from .memory import MemoryStore
 from .release_controller import ReleaseController
 from .coordination import CoordinationWorkflow
+from .llm_planner import LLMPlanner
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper(),
                     format='{"time":"%(asctime)s","level":"%(levelname)s","logger":"%(name)s","message":"%(message)s"}')
@@ -105,7 +106,7 @@ graph_client, graph, graph_name = connect_graph()
 laboratory = Laboratory(graph)
 runtime = Runtime(graph)
 memory_store = MemoryStore(graph)
-coordination = CoordinationWorkflow(graph)
+coordination = CoordinationWorkflow(graph, planner=LLMPlanner.from_env())
 release_controller = None
 release_controller_lock = Lock()
 
@@ -206,11 +207,13 @@ class ReleaseRunIn(BaseModel):
     version: str = Field(min_length=1, max_length=64, pattern=r"^[a-zA-Z0-9._-]+$")
     mode: Literal["healthy", "errors", "slow", "mixed"] = "mixed"
     force_recheck: bool = False
+    components: list[str] = Field(default_factory=list, max_length=8)
 
 class ReleaseInjectIn(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
     version: str = Field(min_length=1, max_length=64, pattern=r"^[a-zA-Z0-9._-]+$")
     mode: Literal["errors", "slow", "mixed"] = "errors"
+    components: list[str] = Field(default_factory=list, max_length=8)
 
 class CoordinationIn(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
