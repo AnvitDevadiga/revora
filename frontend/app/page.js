@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Laboratory from "./Laboratory";
 import Runtime from "./Runtime";
 import GroqAgent from "./GroqAgent";
@@ -39,6 +39,11 @@ export default function Home() {
     } catch (error) { setConnection(error.message === "Failed to fetch" ? "cannot reach the backend. start the local stack or enter a reachable HTTPS backend URL." : error.message); }
     finally { setConnecting(false); }
   }
+  // A deployment built with NEXT_PUBLIC_API_URL connects as soon as the live view opens,
+  // so visitors land directly in the running system.
+  useEffect(() => {
+    if (view === "live" && process.env.NEXT_PUBLIC_API_URL && !connected && !connecting) connect();
+  }, [view]);
   return <main>
     <nav className="site-nav" aria-label="main navigation">
       <a href="/" className="brand" aria-label="revora home"><span className="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" focusable="false"><path d="M10 26V10" /><path d="M10 18C12 12 17 9.5 22 11.5" /></svg></span><span className="brand-word">revora</span></a>

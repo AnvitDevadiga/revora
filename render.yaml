@@ -10,8 +10,9 @@ services:
         sync: false
       - key: FALKORDB_GRAPH
         value: revora
-      - key: REVORA_API_KEY
-        generateValue: true
+      # Public hackathon demo: anonymous access, bounded by rate and body limits.
+      - key: ALLOW_ANONYMOUS
+        value: "true"
       - key: GROQ_API_KEY
         sync: false
       - key: APP_ENV
