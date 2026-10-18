@@ -174,4 +174,4 @@ revora is a single-workspace, single-worker system that gates a project-owned (o
 
 ## Project lead and AI assistance
 
-**Project lead: Anvit Devadiga.** Anvit set revora's product direction and priorities, reported issues throughout development, and guided revisions through ongoing feedback and review. OpenAI Codex and Claude Code assisted with repository review, backend and frontend implementation, debugging, test support, and documentation. Anvit is responsible for the final design and submitted work.
+**Project lead: Anvit Devadiga.** Anvit drove Revora’s product direction, established project priorities, and spearheaded the design and development from end to end. He identified issues, conducted thorough reviews, and refined the implementation throughout the process. DeepSeek V4 and Claude Code provided assistance, mainly with bug fixing and code audits, along with code implementation and documentation support. Anvit takes full responsibility for the final architecture, design, and submitted work.
