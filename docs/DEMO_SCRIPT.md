@@ -4,7 +4,7 @@ Target: about 3 minutes. Record `http://localhost:3000` with the full browser vi
 
 Recording deliverables:
 
-- `docs/artifacts/revora-demo.mp4` — the ~3 minute continuous walkthrough, recorded by the team from this script and saved at this path. Add an `.srt` captions sidecar if captions are burned in.
+- Recorded walkthrough: https://youtu.be/ezqdiSkRHpM
 - `docs/artifacts/current-demo.mp4` and `frontend/public/demo.mp4` — a 14-second two-checkpoint clip (active HTTP 503; graph handoff recovery with three HTTP 200 checks) with `demo.vtt` captions, served in the replay page's walkthrough section. It is explicitly not a continuous screen recording.
 - `docs/artifacts/demo-walkthrough.webm` — the silent automated acceptance recording produced by `frontend/tests/browser.cjs`.
 

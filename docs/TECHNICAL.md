@@ -4,7 +4,7 @@ The one-page overview is in the [README](../README.md). This file keeps the full
 
 **ai remembers. revora learns.**
 
-Demo video: [`docs/artifacts/revora-demo.mp4`](artifacts/revora-demo.mp4) — the team's ~3 minute walkthrough of the live incident loop (recording script and shot list: [`docs/DEMO_SCRIPT.md`](DEMO_SCRIPT.md)). Public replay: [revora-anvitdevadiga.vercel.app](https://revora-anvitdevadiga.vercel.app); fresh execution uses a separately connected backend.
+Demo video: [youtu.be/ezqdiSkRHpM](https://youtu.be/ezqdiSkRHpM) — the ~3 minute walkthrough of the live incident loop (recording script and shot list: [`docs/DEMO_SCRIPT.md`](DEMO_SCRIPT.md)). Public replay: [revora-anvitdevadiga.vercel.app](https://revora-anvitdevadiga.vercel.app); fresh execution uses a separately connected backend.
 
 A Graph Hacks project entered in **Track 2 — Agent Memory and Coordination**: revora operates a live HTTP gateway, measures a candidate release, recovers from an introduced incident, and uses FalkorDB memory to prevent repeating the same failed version. A second workflow demonstrates evidence-driven customer migration with invoice-preservation checks.
 

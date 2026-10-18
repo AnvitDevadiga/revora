@@ -48,7 +48,7 @@ The sanitized source archive excludes environment secrets, Git history, backup d
 ## Delivery still required
 
 - Attach the repository (https://github.com/AnvitDevadiga/revora) through the hackathon submission panel.
-- Record the continuous ~3 minute walkthrough (script in `docs/DEMO_SCRIPT.md`) and save it at `docs/artifacts/revora-demo.mp4`; add narration or captions if the panel requires them. The included two-checkpoint clip is not a continuous recording and should not be presented as one.
+- Done: the continuous ~3 minute narrated walkthrough is published at https://youtu.be/ezqdiSkRHpM.
 - Submit the repository, video, overview, and public replay/local instructions through the hackathon panel before 18 October 2026, 11:59 PM IST.
 - For a fully hosted live demo, supply a persistent Python host and FalkorDB service. The Vercel frontend alone replays recorded evidence.
 
