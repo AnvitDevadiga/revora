@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import CoordinationGraph from "./CoordinationGraph";
 import "./release-ops.css";
 
 export default function ReleaseOps({ request, api }) {
@@ -155,6 +156,12 @@ export default function ReleaseOps({ request, api }) {
     </div>
     {error && <p className="error" role="alert">{error}</p>}
 
+    {blocked && result.prior_evidence && <div className="memory-banner" role="status">
+      <span className="shield" aria-hidden="true">⛨</span>
+      <div><strong>Blocked before its first request — revora remembered.</strong>
+        <span>FalkorDB match: ReleaseIncident {result.prior_evidence.id.slice(0, 8)} · {result.version} · recorded {new Date(result.prior_evidence.timestamp).toLocaleTimeString()} · 0 candidate probes</span></div>
+    </div>}
+
     {result && <div className="release-result" aria-live="polite">
       <div className={`release-verdict ${result.decision === "introduced" ? "is-failing" : ""}`}><small>{outcome}</small><strong>{result.reason}</strong><span>incident {result.id.slice(0, 8)} · candidate {result.version}</span></div>
       <div className="release-metrics">
@@ -165,10 +172,19 @@ export default function ReleaseOps({ request, api }) {
       {result.canary_samples.length > 0 && <div className="probe-strip" aria-label="Measured HTTP responses">{result.canary_samples.map((sample, index) => <span key={index} title={`Request ${index + 1}: HTTP ${sample.status}, ${sample.latency_ms} ms`} className={sample.status === 200 && sample.latency_ms <= 120 ? "probe-tick pass" : "probe-tick fail"} style={{ "--i": index, height: `${Math.max(10, Math.min(42, 8 + Math.round((sample.latency_ms || 0) / 6)))}px` }} />)}</div>}
       <p className="muted">{result.prior_evidence ? `decision linked to prior incident ${result.prior_evidence.id.slice(0, 8)}.` : "first observation for this candidate version."} {result.recovery_samples.length ? `${result.recovery_samples.length} healthy gateway requests verified after rollback.` : ""}</p>
       <div className="handoff-action"><div><strong>evidence-reviewed graph handoff</strong><small>Release Analyst → Evidence Reviewer → Recovery Planner; recovery stays blocked unless measurements pass review.</small></div><button className="primary" onClick={handoff} disabled={busy || result.decision === "introduced"}>{busy ? "reviewing handoff…" : "run agent handoff"}</button></div>
+      {coordination?.trace && <div className="handoff-lanes" aria-label="agent handoff timeline">{coordination.trace.map((step, index) => {
+        const status = step.output?.status || step.output?.action || step.step;
+        return <div className="handoff-lane" key={step.agent + index} style={{ "--i": index }}>
+          <span className="who">{step.agent.replaceAll("_", " ")}</span>
+          <span className={`chip ${step.output?.status || ""}`}>{step.step.replaceAll("_", " ")} → {String(status).replaceAll("_", " ")}</span>
+        </div>;
+      })}</div>}
       {coordination && <div className="handoff-result" aria-live="polite"><strong>{coordination.plan.action.replaceAll("_", " ")}</strong><span>Release Analyst → Evidence Reviewer → Recovery Planner · based on incident {coordination.provenance.source_incident_id.slice(0, 8)}</span>{coordination.plan.evidence_review && <span>Evidence review: {coordination.plan.evidence_review.status.replaceAll("_", " ")}</span>}{coordination.plan.evidence_review?.requested_evidence.length > 0 && <span>Requested: {coordination.plan.evidence_review.requested_evidence.join("; ")}</span>}{coordination.plan.evidence_review?.contradictions.length > 0 && <span>Rejected: {coordination.plan.evidence_review.contradictions.join("; ")}</span>}<span>{coordination.plan.reason}</span>{coordination.execution && <span>Execution verified · {coordination.execution.recovery_samples.length} healthy recovery checks · outcome {coordination.execution.id.slice(0, 8)}</span>}<details><summary>inspect handoff evidence and graph record</summary><pre className="json-record">{JSON.stringify(coordination, null, 2)}</pre></details></div>}
       {result.decision !== "introduced" && <div className="release-actions"><button onClick={() => live?.target_mode === "configured_services" ? run() : stage("/api/release/inject", { version, mode })} disabled={busy || live?.incident_active}>3. retry same version</button><button onClick={() => run(true)} disabled={busy || live?.incident_active}>force fresh check</button></div>}
       <details><summary>inspect request measurements and graph evidence</summary><pre className="json-record">{JSON.stringify(result, null, 2)}</pre></details>
     </div>}
+
+    <CoordinationGraph request={request} api={api} refreshKey={`${result?.id || ""}:${coordination?.handoff?.id || ""}:${history.length}`} />
 
     {history.length > 0 && <div className="release-history"><h3>persistent incident trail</h3><p className="muted">Each retry links to the earlier failed release through a FalkorDB BASED_ON relationship.</p><div>{history.slice(0, 5).map(item => <button key={item.id} onClick={() => { setResult(item); setCoordination(null); }}><span>{item.version}</span><strong>{item.decision.replaceAll("_", " ")}</strong><small>{item.prior_evidence ? `BASED_ON ${item.prior_evidence.id.slice(0, 8)}` : item.timestamp.slice(11, 19)}</small></button>)}</div></div>}
   </section>;

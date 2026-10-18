@@ -175,3 +175,12 @@ def test_same_onset_replay_repairs_interrupted_recovery_state():
         assert controller.route == "stable"
     finally:
         controller.close()
+
+
+def test_graph_view_exposes_incident_handoff_and_decision():
+    workflow = CoordinationWorkflow()
+    workflow.run({"id": "incident-1", "service": "checkout", "version": "v9", "decision": "rollback",
+                  "failed": True, "during": {"status": 503}, "after": {"status": 200}})
+    view = workflow.graph_view("checkout")
+    assert {"ReleaseIncident", "AgentHandoff", "CoordinationDecision"} <= {n["type"] for n in view["nodes"]}
+    assert {"HANDED_OFF", "HANDED_OFF_TO"} <= {e["relation"] for e in view["edges"]}

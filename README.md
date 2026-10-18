@@ -6,6 +6,32 @@ Demo video: [`docs/artifacts/revora-demo.mp4`](docs/artifacts/revora-demo.mp4) �
 
 A Graph Hacks project entered in **Track 2 — Agent Memory and Coordination** and **Track 1 — Agents That Act on Connected Data**: revora operates a live HTTP gateway, measures a candidate release, recovers from an introduced incident, and uses FalkorDB memory to prevent repeating the same failed version. A second workflow demonstrates evidence-driven customer migration with invoice-preservation checks.
 
+**The problem:** AI agents that operate infrastructure forget. A release agent that rolled back `v7` at 2am will happily ship `v7` again at 3am, and a planner agent has no durable way to see what the analyst agent measured.
+
+**What revora does:** three cooperating agent roles (Release Analyst → Evidence Reviewer → Recovery Planner) run a live HTTP gateway, and every incident, handoff, review and decision becomes a FalkorDB node. Before any candidate serves traffic, revora asks the graph whether this exact version already failed. If so, it is blocked with **zero requests sent**, and the new decision is linked to the old failure with `BASED_ON`.
+
+![Live agent coordination graph read from FalkorDB](docs/artifacts/coordination-graph.png)
+
+### Why FalkorDB
+
+- **Memory that changes behaviour.** `_prior_failure` reads the graph *before* routing; a match blocks the release outright. Remove the graph and the same retry serves HTTP 503 (see the acceptance ablation).
+- **Coordination through the graph.** Agents don't call each other. The analyst writes an `AgentHandoff`, and the planner, which may run in a separate process, reads it back from FalkorDB. Each handoff, review and decision is written in **one** Cypher mutation, so a crash never leaves a half-recorded handoff.
+- **Provenance you can traverse.** `BASED_ON`, `RETRIEVED` and `EXECUTED` edges answer "why did the agent do that?" with a multi-hop query (`*1..4`) that powers the live coordination graph in the UI.
+- **Survives restarts.** Controller route state and in-flight incidents are persisted as `ReleaseControllerState`, so a restarted backend resumes the incident it was handling.
+
+### Architecture
+
+```mermaid
+flowchart LR
+  UI["Next.js dashboard<br/>coordination graph · inspector · timeline"] -->|REST / SSE| API[FastAPI]
+  API --> GW["Live HTTP gateway<br/>stable ⇄ candidate"]
+  API --> A[Release Analyst] -->|AgentHandoff| R[Evidence Reviewer] -->|EvidenceReview| P[Recovery Planner]
+  A & R & P -->|parameterised Cypher| F[("FalkorDB<br/>graph: revora")]
+  GW -->|incidents + gate metrics| F
+  F -->|"prior failure → block before traffic"| API
+  F -->|"/api/coordination/graph"| UI
+```
+
 ## Project lead and AI assistance
 
 **Project lead: Anvit Devadiga.** Anvit set revora's product direction and priorities, reported issues throughout development, and guided revisions through ongoing feedback and review. OpenAI Codex assisted with repository review, backend and frontend implementation, debugging, test support, and documentation. Anvit is responsible for the final design and submitted work.
@@ -21,6 +47,24 @@ Open http://localhost:3000, select **Live workspace**, and connect to http://loc
 For manual frontend development, start only the database/backend with `docker compose up -d --build falkordb backend`, then run `npm ci && npm run dev` inside frontend.
 
 Stop with `docker compose stop`. The named database volume is retained. Do not use `down -v` unless you intend to delete all saved graph memory.
+
+### Environment variables
+
+Copy `.env.example` to `.env` at the repo root. Everything is optional for the Compose demo.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `FALKORDB_URL` | set by Compose | e.g. `falkor://falkordb:6379`. Required when `APP_ENV=production` |
+| `FALKORDB_GRAPH` | `revora` | Graph name |
+| `REVORA_API_KEY` | empty | Shared workspace key sent as `x-api-key` |
+| `ALLOW_ANONYMOUS` | `false` | Allow API calls without a key (local only) |
+| `APP_ENV` | `development` | `production` disables the in-memory fallback |
+| `ALLOW_MEMORY_FALLBACK` | `true` | Run without FalkorDB (no restart persistence) |
+| `REVORA_SERVICE_NAME` | `revora-demo` | Service scope for incidents |
+| `REVORA_STABLE_URL` / `REVORA_CANDIDATE_URL` | empty | Gate two real services instead of the built-in demo |
+| `GROQ_API_KEY` / `GROQ_MODEL` | empty / `openai/gpt-oss-20b` | Optional model-backed agent panel |
+| `CORS_ORIGINS` | `http://localhost:3000,http://127.0.0.1:3000` | Allowed frontend origins |
+| `RATE_LIMIT_PER_MINUTE`, `MAX_BODY_BYTES`, `LOG_LEVEL`, `FORWARDED_ALLOW_IPS` | see `.env.example` | API safety bounds |
 
 ## Live incident response: the primary demo
 
@@ -66,7 +110,7 @@ Click **Run memory ablation** to run three paired synthetic workloads in fresh c
 
 Context includes service, environment and workload. Every request has a retry ID. Repeating a request returns its original result; reusing its ID for different input returns 409. Destructive identity reconciliation requires explicit `merge_authorized: true`; the API defaults permission to `false` and returns review-required without deleting rows.
 
-The graph stores AgentRun, AgentDecision, AgentObservation and BeliefVersion nodes. Decisions link to prior observations through BASED_ON; observations link to revisions. The API traverses the current context's OBSERVED edges to retrieve evidence. Each run's graph records are persisted in one mutation. `POST /api/runtime/proof` creates a fresh cohort and returns the memory run, same-budget no-memory run, direct one-shot reference, invariant results, and a machine-checked proof verdict. `POST /api/runtime/ablation` executes the paired memory-on/memory-off comparison. `POST /api/coordination/run` accepts an incident ID from saved release history and records the analyst → reviewer → planner workflow; `GET /api/coordination/history` returns saved handoffs.
+The graph stores AgentRun, AgentDecision, AgentObservation and BeliefVersion nodes. Decisions link to prior observations through BASED_ON; observations link to revisions. The API traverses the current context's OBSERVED edges to retrieve evidence. Each run's graph records are persisted in one mutation. `POST /api/runtime/proof` creates a fresh cohort and returns the memory run, same-budget no-memory run, direct one-shot reference, invariant results, and a machine-checked proof verdict. `POST /api/runtime/ablation` executes the paired memory-on/memory-off comparison. `POST /api/coordination/run` accepts an incident ID from saved release history and records the analyst → reviewer → planner workflow; `GET /api/coordination/history` returns saved handoffs. `GET /api/coordination/graph` returns the live incident → handoff → review → decision subgraph that the dashboard draws; click any node to see its properties, edges and the Cypher that wrote it.
 
 ## Graph model and Cypher
 
@@ -87,6 +131,20 @@ CREATE (r)-[:FORWARDED_TO]->(d)
 CREATE (h)-[:HANDED_OFF_TO]->(d) CREATE (d)-[:BASED_ON]->(i)
 -- plus optional RETRIEVED (reused prior handoff) and EXECUTED (recovery outcome) edges
 
+-- live coordination view: multi-hop provenance for the newest incidents (GET /api/coordination/graph)
+MATCH (i:ReleaseIncident {service:$service})
+WITH i ORDER BY i.timestamp DESC LIMIT $limit
+OPTIONAL MATCH (i)-[:HANDED_OFF|REVIEWED_BY|FORWARDED_TO|HANDED_OFF_TO
+                   |BASED_ON|EXECUTED|RETRIEVED*1..4]-(n)
+WITH collect(DISTINCT i) AS seeds, collect(DISTINCT n) AS reached
+WITH seeds + [n IN reached WHERE NOT n IN seeds] AS ns
+UNWIND ns AS a OPTIONAL MATCH (a)-[r]->(b) WHERE b IN ns
+RETURN ns, collect(DISTINCT r)
+
+-- gate metrics are first-class properties, so incidents are queryable by measurement
+MATCH (i:ReleaseIncident) WHERE i.error_rate > 0.05 OR i.p95_latency_ms > 120
+RETURN i.version, i.error_rate, i.p95_latency_ms ORDER BY i.timestamp DESC
+
 -- migration memory: retrieve observations that validate an active procedure
 MATCH (r:AgentRun {context:$context})-[:OBSERVED]->(o:AgentObservation)
 WHERE r.memory_enabled = true
@@ -95,6 +153,18 @@ RETURN o.payload,r.schema_version,p.id ORDER BY r.created_at,o.id
 ```
 
 Release-memory schema (incidents, handoffs, reviews, decisions, controller state):
+
+```mermaid
+graph LR
+  I2["ReleaseIncident<br/>v7 · blocked_from_memory"] -- BASED_ON --> I1["ReleaseIncident<br/>v7 · rollback<br/>error_rate, p95_latency_ms"]
+  I1 -- HANDED_OFF --> H[AgentHandoff<br/>release_analyst]
+  H -- REVIEWED_BY --> R[EvidenceReview<br/>evidence_reviewer]
+  R -- FORWARDED_TO --> D[CoordinationDecision<br/>recovery_planner]
+  H -- HANDED_OFF_TO --> D
+  D -- BASED_ON --> I1
+  D -- EXECUTED --> I1
+  D -. RETRIEVED .-> H0[prior AgentHandoff]
+```
 
 ```text
 (ReleaseIncident)-[:HANDED_OFF]->(AgentHandoff)
@@ -175,27 +245,12 @@ Real database acceptance scripts are `backend/tests/integration_runtime.py` and 
 Frontend production build: `cd frontend && npm ci && npm run build`.
 Browser acceptance: `frontend/tests/browser.cjs` uses Playwright and installed Chrome, with the local API configured with test key `local-audit-key`. This is a test fixture, not a production secret. It records a walkthrough and screenshots under docs/artifacts.
 
-## Scope and operating limits
+## Scope
 
-- One local workspace, one API worker. Locks are process-local; multi-worker correctness, distributed coordination, and authenticated multi-tenant memory isolation are not implemented or claimed.
-- Up to 1,000 runs per graph and 1,000 input rows per tool run.
-- With no FALKORDB_URL the API uses temporary memory, visibly identified in the UI; Compose always configures FalkorDB.
-- Optional REVORA_API_KEY protects API routes; health and CORS preflight remain accessible.
-- The retired pre-event episode/procedure prototype and its routes are removed. Active memory uses the documented Experience/Evidence/Belief and AgentRun graph schemas.
-- The public frontend is a clearly labeled replay of verified local acceptance evidence. A hosted live Python backend and FalkorDB are not included; live mode connects to an operator-provided backend.
+revora is a single-workspace, single-worker local system that gates a project-owned (or one operator-configured) service pair. The fault is intentionally injected; HTTP traffic, measurements, routing and recovery are real. The analyst, reviewer and planner are bounded deterministic roles; the optional Groq panel is the model-backed agent. Full operating limits and audit boundaries are in [docs/SUBMISSION_AUDIT.md](docs/SUBMISSION_AUDIT.md#scope-and-operating-limits).
 
 See [PROJECT_STATUS.md](PROJECT_STATUS.md), [demo script](docs/DEMO_SCRIPT.md), and [submission audit](docs/SUBMISSION_AUDIT.md).
 
 ## Submission acceptance and public replay
 
 Run `FALKORDB_URL=falkor://127.0.0.1:6379 PYTHONPATH=. python tests/integration_submission.py` from `backend/`. It creates a uniquely named graph, launches a receiving worker in a separate Python interpreter, restarts the FastAPI process with an incident active, and verifies restored-state recovery through the authenticated tool endpoint. It also checks graph links, isolated ablations, adverse-memory rejection, edge-removal behavior, scoped contradiction semantics, failed mutation safety, and interrupted-handoff retry, then exports evidence to `frontend/public/evidence.json` and `docs/artifacts/submission-evidence.json`. The test graph remains available for inspection. The public replay reads this acceptance record; it does not fabricate live API responses.
-
-## Audit corrections and boundaries
-
-The current backend uses scoped outcome expectations, a single mutation per belief revision, explicit memory rejection reasons, and active graph procedure support paths. The investigator and recovery worker can execute through a persisted handoff rather than merely annotate an already repaired incident. See the [fix ledger](docs/FIX_LEDGER.md) for the audit changes and evidence.
-
-The action space remains predefined. `VerifiedProcedure` means a predefined tool sequence has supporting observed outcomes; it does not mean the system synthesized a new procedure. The fair warm-task baseline has the same two-attempt recovery budget and succeeds; graph memory reaches that same outcome while avoiding one failed tool call. The three-case ablation avoids two failed calls and changes no outcomes. The adverse evaluation includes competent static policies and does not establish general superiority over them. Baseline success and recovery costs are reported even when they weaken the project's performance claim.
-
-Use `POST /api/coordination/diagnose` to measure and publish a handoff, then `POST /api/coordination/execute` with its `handoff_id` from a separate worker. `POST /api/coordination/recover` performs both steps for the UI. Expired or mismatched handoffs are rejected. The recovery tool reloads authoritative graph evidence and accepts no arbitrary command or target URL.
-
-Run `POST /api/evaluation/adversarial` for the versioned adverse cases. Migration requests support `schema_version` and `merge_authorized`; denied merges require review. The separate Groq fixture reports simulated release decisions with `executed=false`; it does not operate the live gateway.

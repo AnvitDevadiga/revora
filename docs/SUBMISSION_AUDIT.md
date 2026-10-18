@@ -63,3 +63,22 @@ FALKORDB_URL=falkor://127.0.0.1:6379 PYTHONPATH=. python tests/integration_submi
 ```
 
 The integration script intentionally leaves its uniquely named acceptance graph for inspection. Stop the stack with `docker compose stop` to retain the graph volume.
+
+## Scope and operating limits
+
+- One local workspace, one API worker. Locks are process-local; multi-worker correctness, distributed coordination, and authenticated multi-tenant memory isolation are not implemented or claimed.
+- Up to 1,000 runs per graph and 1,000 input rows per tool run.
+- With no FALKORDB_URL the API uses temporary memory, visibly identified in the UI; Compose always configures FalkorDB.
+- Optional REVORA_API_KEY protects API routes; health and CORS preflight remain accessible.
+- The retired pre-event episode/procedure prototype and its routes are removed. Active memory uses the documented Experience/Evidence/Belief and AgentRun graph schemas.
+- The public frontend is a clearly labeled replay of verified local acceptance evidence. A hosted live Python backend and FalkorDB are not included; live mode connects to an operator-provided backend.
+
+## Audit corrections and boundaries
+
+The current backend uses scoped outcome expectations, a single mutation per belief revision, explicit memory rejection reasons, and active graph procedure support paths. The investigator and recovery worker can execute through a persisted handoff rather than merely annotate an already repaired incident. See the [fix ledger](docs/FIX_LEDGER.md) for the audit changes and evidence.
+
+The action space remains predefined. `VerifiedProcedure` means a predefined tool sequence has supporting observed outcomes; it does not mean the system synthesized a new procedure. The fair warm-task baseline has the same two-attempt recovery budget and succeeds; graph memory reaches that same outcome while avoiding one failed tool call. The three-case ablation avoids two failed calls and changes no outcomes. The adverse evaluation includes competent static policies and does not establish general superiority over them. Baseline success and recovery costs are reported even when they weaken the project's performance claim.
+
+Use `POST /api/coordination/diagnose` to measure and publish a handoff, then `POST /api/coordination/execute` with its `handoff_id` from a separate worker. `POST /api/coordination/recover` performs both steps for the UI. Expired or mismatched handoffs are rejected. The recovery tool reloads authoritative graph evidence and accepts no arbitrary command or target URL.
+
+Run `POST /api/evaluation/adversarial` for the versioned adverse cases. Migration requests support `schema_version` and `merge_authorized`; denied merges require review. The separate Groq fixture reports simulated release decisions with `executed=false`; it does not operate the live gateway.

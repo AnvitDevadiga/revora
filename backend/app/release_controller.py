@@ -292,7 +292,8 @@ class ReleaseController:
             self.graph.query(
                 "MERGE (i:ReleaseIncident {id:$id}) SET i.service=$service,i.version=$version,"
                 "i.failed=$failed,i.decision=$decision,i.timestamp=$timestamp,i.onset_id=$onset_id,"
-                "i.handoff_id=$handoff_id,"
+                "i.handoff_id=$handoff_id,i.sample_count=$sample_count,"
+                "i.error_rate=$error_rate,i.p95_latency_ms=$p95_latency_ms,"
                 "i.payload=$payload "
                 "WITH i OPTIONAL MATCH (prior:ReleaseIncident {id:$prior_id}) "
                 "FOREACH (_ IN CASE WHEN prior IS NULL THEN [] ELSE [1] END | "
@@ -302,6 +303,10 @@ class ReleaseController:
                  "decision": incident["decision"], "timestamp": incident["timestamp"],
                  "payload": json.dumps(incident), "onset_id": incident.get("onset_id", ""),
                  "handoff_id": incident.get("handoff_id", ""),
+                 # Gate metrics are first-class properties so Cypher can filter on them.
+                 "sample_count": (incident.get("metrics") or {}).get("sample_count"),
+                 "error_rate": (incident.get("metrics") or {}).get("error_rate"),
+                 "p95_latency_ms": (incident.get("metrics") or {}).get("p95_latency_ms"),
                  "prior_id": (incident.get("prior_evidence") or {}).get("id", "")})
         else:
             self.local_incidents.append(incident)

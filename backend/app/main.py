@@ -17,6 +17,7 @@ from contextlib import asynccontextmanager
 from hashlib import sha256
 import logging
 import math
+from redis.exceptions import ConnectionError as RedisConnectionError, TimeoutError as RedisTimeoutError
 from .database import connect_graph
 from .laboratory import Laboratory, SCENARIOS
 from .runtime import Runtime, evaluate
@@ -303,6 +304,11 @@ def coordination_recover():
     except ValueError as error:
         raise HTTPException(409, str(error)) from error
 
+@app.get("/api/coordination/graph")
+def coordination_graph(limit: int = Query(default=20, ge=1, le=100)):
+    """Live multi-agent provenance graph read directly from FalkorDB."""
+    return coordination.graph_view(get_release_controller().service, limit)
+
 @app.get("/api/coordination/history")
 def coordination_history():
     return {"items": coordination.history()}
@@ -368,6 +374,14 @@ def agent_stream(payload: GroqRunIn):
         "Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no",
         "Connection": "keep-alive",
     })
+
+@app.exception_handler(RedisConnectionError)
+@app.exception_handler(RedisTimeoutError)
+async def graph_unavailable(_request: Request, error: Exception):
+    """Surface a lost FalkorDB connection as a retryable 503 instead of a bare 500."""
+    logger.error("graph_unavailable error=%s", type(error).__name__)
+    return JSONResponse({"detail": "FalkorDB is unavailable; retry shortly", "error": "graph_unavailable"},
+                        status_code=503, headers={"Retry-After": "2"})
 
 @app.get("/api/graph/state")
 def graph_state():

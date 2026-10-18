@@ -262,3 +262,46 @@ class CoordinationWorkflow:
                 "RETURN h.payload,d.payload ORDER BY h.created_at DESC LIMIT $limit", {"limit": limit}).result_set
             return [{"handoff": json.loads(row[0]), "plan": json.loads(row[1]) if row[1] else None} for row in rows]
         return list(reversed(list(self.records.values())))[:limit]
+
+    def graph_view(self, service: str, limit: int = 20) -> dict:
+        """Coordination subgraph for the newest incidents: incident -> handoff -> review -> decision.
+
+        A variable-length traversal (up to 4 hops) collects every provenance edge,
+        including retry BASED_ON links back to earlier failed incidents.
+        """
+        if self.graph is None:
+            nodes, edges = {}, []
+            items = [item for item in self.records.values() if item["handoff"]["evidence"]["service"] == service]
+            for item in items[-limit:]:
+                handoff, plan = item["handoff"], item.get("plan")
+                incident_id = handoff["evidence"]["incident_id"]
+                nodes[incident_id] = {"id": incident_id, "type": "ReleaseIncident",
+                                      "version": handoff["evidence"]["version"],
+                                      "status": handoff["evidence"]["decision"]}
+                nodes[handoff["id"]] = {"id": handoff["id"], "type": "AgentHandoff", "agent": "release_analyst"}
+                edges.append({"source": incident_id, "target": handoff["id"], "relation": "HANDED_OFF"})
+                if plan and plan.get("id"):
+                    nodes[plan["id"]] = {"id": plan["id"], "type": "CoordinationDecision",
+                                         "agent": "recovery_planner", "status": plan.get("action")}
+                    edges.append({"source": handoff["id"], "target": plan["id"], "relation": "HANDED_OFF_TO"})
+            return {"nodes": list(nodes.values()), "edges": edges}
+        rels = "HANDED_OFF|REVIEWED_BY|FORWARDED_TO|HANDED_OFF_TO|BASED_ON|EXECUTED|RETRIEVED"
+        # Collect distinct reachable nodes (no path materialisation), then the edges among them.
+        # Incidents with no edges yet still appear because they are collected on their own.
+        rows = self.graph.query(
+            "MATCH (i:ReleaseIncident {service:$service}) WITH i ORDER BY i.timestamp DESC LIMIT $limit "
+            f"OPTIONAL MATCH (i)-[:{rels}*1..4]-(n) "
+            "WITH collect(DISTINCT i) AS seeds, collect(DISTINCT n) AS reached "
+            "WITH seeds + [n IN reached WHERE NOT n IN seeds] AS ns "
+            f"UNWIND ns AS a OPTIONAL MATCH (a)-[r:{rels}]->(b) WHERE b IN ns "
+            "WITH ns, collect(DISTINCT r) AS rs "
+            "RETURN [n IN ns | [n.id, labels(n)[0], n.version, coalesce(n.decision, n.status, n.action), "
+            "n.agent, coalesce(n.timestamp, n.created_at), n.error_rate, n.p95_latency_ms, n.sample_count]], "
+            "[r IN rs | [startNode(r).id, type(r), endNode(r).id]]",
+            {"service": service, "limit": limit}).result_set
+        if not rows:
+            return {"nodes": [], "edges": []}
+        keys = ("id", "type", "version", "status", "agent", "timestamp", "error_rate", "p95_latency_ms", "sample_count")
+        nodes = [dict(zip(keys, n)) for n in rows[0][0] or []]
+        edges = [{"source": a, "relation": rel, "target": b} for a, rel, b in rows[0][1] or []]
+        return {"nodes": nodes, "edges": edges}

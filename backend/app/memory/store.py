@@ -40,6 +40,10 @@ class MemoryStore:
             "CREATE INDEX FOR (i:ReleaseIncident) ON (i.version)",
             "CREATE INDEX FOR (i:ReleaseIncident) ON (i.handoff_id)",
             "CREATE INDEX FOR (h:AgentHandoff) ON (h.incident_id)",
+            "CREATE INDEX FOR (h:AgentHandoff) ON (h.id)",
+            "CREATE INDEX FOR (h:AgentHandoff) ON (h.service)",
+            "CREATE INDEX FOR (d:CoordinationDecision) ON (d.id)",
+            "CREATE INDEX FOR (i:ReleaseIncident) ON (i.id)",
         )
         for statement in statements:
             try:
@@ -205,6 +209,33 @@ class MemoryStore:
                 "confidence_score": confidence}
 
     def neighborhood(self, query: str, limit: int = 24) -> dict:
+        """Return memory nodes whose text matches `query`, plus their 1-hop paths."""
+        if self.graph is not None:
+            nodes: dict[str, dict] = {}
+            edges: dict[tuple, dict] = {}
+            # One labelled scan per memory type so FalkorDB never scans unrelated release/lab nodes.
+            for label in ("Experience", "Evidence", "Belief"):
+                rows = self._query(
+                    f"MATCH (n:{label}) "
+                    "WHERE toLower(coalesce(n.statement, n.action_taken, n.description, '')) CONTAINS toLower($q) "
+                    "WITH n LIMIT $limit "
+                    "OPTIONAL MATCH (n)-[r]-(m) WHERE m:Experience OR m:Evidence OR m:Belief "
+                    "RETURN n.id,labels(n)[0],n.statement,n.action_taken,n.outcome,n.status,n.confidence_score, "
+                    "m.id,labels(m)[0],m.statement,m.action_taken,m.outcome,m.status,m.confidence_score, "
+                    "type(r),startNode(r).id,r.reason LIMIT $row_limit",
+                    {"q": query, "limit": limit, "row_limit": limit * 4})
+                for row in rows:
+                    nodes.setdefault(row[0], self._node_view(*row[0:7]))
+                    if row[7] is None:
+                        continue
+                    nodes.setdefault(row[7], self._node_view(*row[7:14]))
+                    source = row[15]
+                    target = row[7] if source == row[0] else row[0]
+                    edges[(source, row[14], target)] = {"source": source, "target": target,
+                                                        "relation": row[14], "reason": row[16]}
+            kept = dict(list(nodes.items())[:limit])
+            return {"query": query, "nodes": list(kept.values()),
+                    "edges": [e for e in edges.values() if e["source"] in kept and e["target"] in kept]}
         query_lower = query.casefold()
         state = self.graph_state()
         matched = {n["id"] for n in state["nodes"] if query_lower in n.get("label", "").casefold()}
