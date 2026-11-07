@@ -2,7 +2,7 @@
 
 **ai remembers. revora learns.** · Graph Hacks — **Track 2: Agent Memory and Coordination** · powered by FalkorDB
 
-▶ **[Watch the demo video](https://youtu.be/ezqdiSkRHpM)** · Live app: [revora-anvitdevadiga.vercel.app](https://revora-anvitdevadiga.vercel.app) · Full technical reference: [docs/TECHNICAL.md](docs/TECHNICAL.md)
+▶ **[Watch the demo video](https://youtu.be/ezqdiSkRHpM)** · Full technical reference: [docs/TECHNICAL.md](docs/TECHNICAL.md)
 
 **The problem.** Agents that run infrastructure forget. A release agent that rolled back `v7` at 2am will ship `v7` again at 3am, and it will happily ship `v8` too, even though `v8` carries the same broken SDK. Meanwhile the agent that planned the fix has no durable way to see what the measuring agent observed.
 
